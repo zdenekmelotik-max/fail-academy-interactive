@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="cs" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>FAIL Academy — Interaktivní trénink</title>
+<style>
+:root{
+  --bg:#f5f6fa; --surface:#ffffff; --surface-2:#eef0f7; --border:#e2e5ee;
+  --text:#1c2333; --muted:#5a6274; --faint:#828aa0;
+  --brand:#c8102e; --brand-2:#7a1020; --accent:#3d5afe; --accent-soft:#eaeeff;
+  --gold:#b8860b; --gold-soft:#fbf3dc; --green:#1a7f5a; --green-soft:#e5f4ee;
+  --shadow:0 1px 3px rgba(20,25,45,.08),0 8px 24px rgba(20,25,45,.06);
+  --radius:14px; --maxw:1180px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12141c; --surface:#1b1e29; --surface-2:#232735; --border:#2f3444;
+    --text:#e9ecf5; --muted:#a7afc4; --faint:#7f889e;
+    --brand:#ff5a72; --brand-2:#ff8090; --accent:#8ea2ff; --accent-soft:#20263f;
+    --gold:#e8b640; --gold-soft:#2a2416; --green:#5fcfa1; --green-soft:#16281f;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;
+  font-size:16px;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{line-height:1.25;margin:0 0 .5em}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+
+header.top{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;
+  padding:34px 0 30px;position:relative;overflow:hidden}
+header.top::after{content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(255,255,255,.16),transparent 70%);pointer-events:none}
+.eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.85;font-weight:700;margin-bottom:10px}
+header.top h1{font-size:32px;margin:0 0 8px;font-weight:800;letter-spacing:-.01em}
+header.top p{margin:0;max-width:720px;opacity:.94;font-size:16.5px}
+.hmeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);
+  padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:600}
+
+.layout{display:grid;grid-template-columns:262px 1fr;gap:30px;align-items:start;
+  max-width:var(--maxw);margin:0 auto;padding:26px 22px 60px}
+nav.side{position:sticky;top:16px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;max-height:calc(100vh - 32px);overflow:auto}
+nav.side .nlabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+  font-weight:700;padding:8px 10px 4px}
+.navbtn{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:transparent;
+  color:var(--text);font:inherit;font-size:14px;padding:9px 10px;border-radius:9px;cursor:pointer;line-height:1.3}
+.navbtn:hover{background:var(--surface-2)}
+.navbtn.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.navbtn .num{flex:0 0 26px;height:26px;border-radius:7px;background:var(--surface-2);color:var(--muted);
+  display:grid;place-items:center;font-size:12.5px;font-weight:700}
+.navbtn.active .num{background:var(--accent);color:#fff}
+
+main{min-width:0}
+.module{display:none;animation:fade .35s ease}
+.module.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.mhead{margin-bottom:18px}
+.mkicker{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;
+  color:var(--brand);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.mkicker .dot{width:7px;height:7px;border-radius:50%;background:var(--brand)}
+.module h2{font-size:27px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+.lead{font-size:17px;color:var(--muted);max-width:760px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px 24px;margin:16px 0}
+.card h3{font-size:17px;margin-bottom:12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.card h3 .ic{font-size:19px}
+.folderlink{font-size:12.5px;font-weight:600;margin-inline-start:auto;white-space:nowrap}
+
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin-top:4px}
+.res>a,.res>span{display:flex;gap:9px;align-items:flex-start;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;color:var(--text)}
+.res>a:hover{border-color:var(--accent);text-decoration:none}
+.res .rt{font-weight:700;display:block;font-size:13.5px}
+.res .rt a{color:var(--text)}
+.res .rt a:hover{color:var(--accent)}
+.res .rs{color:var(--faint);font-size:12px;display:block;margin-top:2px}
+.res .rs a{color:var(--accent);font-weight:600}
+.res .em{font-size:16px;line-height:1.2;flex:0 0 auto}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.concept{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 17px}
+.concept h4{font-size:15px;margin-bottom:5px;display:flex;gap:8px;align-items:baseline}
+.concept h4 .cn{color:var(--brand);font-weight:800;font-size:13px}
+.concept p{margin:0;font-size:14px;color:var(--muted)}
+
+.quote{border-inline-start:4px solid var(--brand);background:var(--surface);padding:14px 18px;
+  border-radius:0 10px 10px 0;margin:12px 0;font-size:15.5px;font-style:italic;color:var(--text)}
+.quote cite{display:block;margin-top:7px;font-style:normal;font-size:13px;color:var(--faint);font-weight:600}
+
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+.tbl th{background:var(--surface-2);text-align:start;padding:10px 12px;font-weight:700;font-size:12.5px;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border)}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td strong{color:var(--text)}
+.tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+
+ul.clean{margin:6px 0 0;padding-inline-start:20px}
+ul.clean li{margin:5px 0;color:var(--muted)}
+ul.clean li strong{color:var(--text)}
+.callout{background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);
+  border-radius:10px;padding:13px 16px;margin:12px 0;font-size:14.5px}
+.callout.green{background:var(--green-soft);border-color:color-mix(in srgb,var(--green) 30%,transparent)}
+.callout.blue{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+.callout b{color:var(--text)}
+
+.story{border-inline-start:3px solid var(--accent);padding:4px 0 4px 16px;margin:16px 0}
+.story .sh{font-weight:700;font-size:15.5px;margin-bottom:5px}
+.story .sl{font-size:14px;color:var(--muted);margin:3px 0}
+.story .sl b{color:var(--text)}
+.story .princip{font-size:13.5px;color:var(--brand);margin-top:7px;font-weight:600}
+
+details{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin:12px 0;overflow:hidden}
+details summary{cursor:pointer;padding:14px 20px;font-weight:700;font-size:15.5px;list-style:none;display:flex;align-items:center;gap:9px}
+details summary::-webkit-details-marker{display:none}
+details summary .sic{font-size:18px}
+details summary::after{content:"+";margin-inline-start:auto;font-size:22px;color:var(--faint);font-weight:400;line-height:1}
+details[open] summary::after{content:"\2013"}
+.dcontent{padding:2px 20px 18px}
+.dcontent .tbl{margin-top:0}
+
+.bonus{background:var(--surface-2);border:1px dashed var(--border);border-radius:12px;padding:15px 18px;margin:14px 0}
+.bonus .bt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:8px}
+.bonus .bitem{padding:8px 0;border-top:1px solid var(--border)}
+.bonus .bitem:first-of-type{border-top:0}
+.bonus .bitem b{font-size:14.5px}
+
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+.pbtn{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 16px;
+  cursor:pointer;font:inherit;color:var(--text);text-align:start;transition:border-color .15s}
+.pbtn:hover{border-color:var(--accent)}
+.pbtn:disabled{opacity:.4;cursor:default}
+.pbtn .pl{font-size:11.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;font-weight:700;display:block}
+.pbtn .pv{font-size:14.5px;font-weight:700;margin-top:2px;display:block}
+.pbtn.next{text-align:end}
+
+footer{border-top:1px solid var(--border);background:var(--surface);padding:26px 0;color:var(--muted);font-size:13.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:16px 0}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;text-align:center}
+.stat .sv{font-size:30px;font-weight:800;color:var(--brand);line-height:1}
+.stat .sl{font-size:13px;color:var(--muted);margin-top:5px}
+.ovmod{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:6px}
+.ovcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 16px;cursor:pointer;transition:border-color .15s,transform .15s}
+.ovcard:hover{border-color:var(--brand);transform:translateY(-2px)}
+.ovcard .on{font-size:12px;font-weight:800;color:var(--brand);letter-spacing:.05em}
+.ovcard .oh{font-size:15px;font-weight:700;margin:4px 0 4px}
+.ovcard .od{font-size:13px;color:var(--muted)}
+
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr;padding-top:14px}
+  nav.side{position:static;max-height:none;order:-1;display:flex;flex-wrap:wrap;gap:6px}
+  nav.side .nlabel{width:100%}
+  .navbtn{width:auto}
+  header.top h1{font-size:25px}
+}
+@media print{
+  nav.side,.pager,header.top::after{display:none}
+  .module{display:block!important}
+  details{border:0}.dcontent{display:block!important}
+  .card{break-inside:avoid;box-shadow:none}
+}
+
+.mobile-bar{display:none;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 16px;background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;
+  position:sticky;top:0;z-index:50}
+.mobile-bar .mbrand{font-weight:800;font-size:15px}
+.mobile-bar .mmenu{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);
+  color:#fff;border-radius:9px;padding:8px 12px;font:inherit;font-weight:700;cursor:pointer}
+.layout.nav-open nav.side{display:block}
+.video-embed{position:relative;padding-bottom:56.25%;height:0;border-radius:12px;overflow:hidden;
+  background:#000;margin:10px 0 16px}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.section-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 16px}
+.section-tabs button{border:1px solid var(--border);background:var(--surface-2);color:var(--text);
+  border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.section-tabs button.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.quiz-block .qq{margin:0 0 18px}
+.quiz-block .qq p{font-weight:700;margin:0 0 8px}
+.quiz-opt{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;margin:6px 0;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px}
+.quiz-opt.ok{background:var(--green-soft);border-color:var(--green)}
+.quiz-opt.bad{background:#fde8ec;border-color:var(--brand)}
+.quiz-result{display:none;margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);font-weight:700}
+.task-ui{list-style:none;padding:0;margin:0}
+.task-ui li{padding:12px 14px;margin:0 0 8px;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:10px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.task-ui .tn{flex:0 0 28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-weight:800;font-size:12px}
+.back-top{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;font-weight:700;font-size:14px;
+  color:var(--accent);background:none;border:0;cursor:pointer;padding:0}
+.share-note{font-size:13px;color:var(--muted);margin-top:10px}
+.bonus .bitem a[href*=".md"],
+.bonus .bitem a[href*="sharepoint"],
+.bonus .bitem a[href*=".pdf"],
+.bonus .bitem a[href*=".html"]:not([href*="youtu"]){display:none}
+.res a[href*=".md"], .res span:has(a[href*=".md"]),
+.res a[href*="sharepoint"], .folderlink,
+.res a[href*=".pdf"]{display:none !important}
+@media (max-width:900px){
+  .mobile-bar{display:flex}
+  .layout{grid-template-columns:1fr;padding-top:0}
+  nav.side{display:none;position:fixed;inset:56px 0 auto 0;z-index:40;max-height:calc(100vh - 56px);
+    border-radius:0;box-shadow:var(--shadow)}
+  header.top{padding:22px 0 18px}
+  header.top h1{font-size:24px}
+}
+
+</style>
+</head>
+<body>
+<div class="mobile-bar">
+  <div class="mbrand">FAIL Academy</div>
+  <button type="button" class="mmenu" id="mobileMenuBtn" aria-label="Menu">Menu</button>
+</div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Future AI Leader · Program 2026</div>
+    <h1>AI Future Leaders Academy — přehled programu</h1>
+    <p>Přehledný souhrn desetitýdenního programu o praktické práci s umělou inteligencí. Deset modulů, klíčové koncepty, nástroje, příběhy z praxe, slovníčky a funkční odkazy na videa i materiály — na jednom místě, pro sdílení s kolegy.</p>
+    <div class="hmeta">
+      <span class="chip">10 modulů</span>
+      <span class="chip">+ bonusové sessions</span>
+      <span class="chip">Videa · prezentace · přepisy · prompty</span>
+      <span class="chip">Lektor: Filip Drimalka</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="side" aria-label="Moduly">
+    <div class="nlabel">Obsah</div>
+    <button class="navbtn active" data-nav="ov"><span class="num">★</span> Úvod &amp; jak web používat</button>
+    <div class="nlabel">Moduly</div>
+    <button class="navbtn" data-nav="m1"><span class="num">1</span> AI mindset</button>
+    <button class="navbtn" data-nav="m2"><span class="num">2</span> Správné AI nástroje</button>
+    <button class="navbtn" data-nav="m3"><span class="num">3</span> Symbióza s AI</button>
+    <button class="navbtn" data-nav="m4"><span class="num">4</span> Druhý mozek</button>
+    <button class="navbtn" data-nav="m5"><span class="num">5</span> Tvorba obsahu</button>
+    <button class="navbtn" data-nav="m6"><span class="num">6</span> Akcelerace projektů</button>
+    <button class="navbtn" data-nav="m7"><span class="num">7</span> Vibe coding</button>
+    <button class="navbtn" data-nav="m8"><span class="num">8</span> Práce s daty</button>
+    <button class="navbtn" data-nav="m9"><span class="num">9</span> Automatizace</button>
+    <button class="navbtn" data-nav="m10"><span class="num">10</span> AI trendy</button>
+  </nav>
+
+  <main>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section class="module active" data-module="ov">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Úvod</div>
+      <h2>Co v tomto přehledu najdete</h2>
+      <p class="lead">Program Future AI Leader (FAIL) provádí manažery a profesionály praktickou adopcí AI — od změny myšlení přes výběr nástrojů, druhý mozek a tvorbu obsahu až po vibe coding, práci s daty a automatizaci. Tento web shrnuje esenci každého modulu a odkazuje na původní videa i materiály.</p>
+    </div>
+
+    <div class="callout blue">
+      <b>⚠️ <b>Pro sdílení s kolegy:</b> Tato stránka je jeden soubor — otevřete ji v prohlížeči. Navigace vlevo (na mobilu Menu). Videa, koncepty, úkoly a kvízy jsou přímo zde. Progress se nesleduje.</div>
+
+    <div class="stats">
+      <div class="stat"><div class="sv">10</div><div class="sl">hlavních modulů</div></div>
+      <div class="stat"><div class="sv">10</div><div class="sl">týdnů programu</div></div>
+      <div class="stat"><div class="sv">7+</div><div class="sl">bonusových sessions</div></div>
+      <div class="stat"><div class="sv">4</div><div class="sl">úrovně práce s AI</div></div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🧭</span> Jak web používat</h3>
+      <ul class="clean">
+        <li>V levém menu (na mobilu nahoře) přepínáte mezi <strong>moduly</strong>. Každý modul má podobnou strukturu: materiály → shrnutí → koncepty → nástroje → příběhy → chyby → slovníček.</li>
+        <li>Každý modul má <strong>videa přímo na stránce</strong>, koncepty, příběhy, úkoly a kvíz — vše v jednotném UI.</li>
+        <li>Delší sekce (slovníčky, tipy) jsou <strong>sbalené</strong> — rozkliknete je kliknutím na nadpis.</li>
+        <li>Web je <strong>jeden samostatný soubor</strong> — funguje offline, dá se poslat e-mailem, otevřít na mobilu i vytisknout (Ctrl/⌘+P).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🎯</span> Čtyři úrovně práce s AI (rámec celého programu)</h3>
+      <div class="grid">
+        <div class="concept"><h4><span class="cn">L0</span> Explorer</h4><p>Občas použije AI, vezme první výstup bez iterace. Když je nespokojený, vrátí se ke starému způsobu.</p></div>
+        <div class="concept"><h4><span class="cn">L1</span> Operátor</h4><p>Používá AI pravidelně, umí promptovat a iterovat, ale nemá v tom systém.</p></div>
+        <div class="concept"><h4><span class="cn">L2</span> Builder</h4><p>Staví opakovatelné workflow, asistenty, šablony a nástroje.</p></div>
+        <div class="concept"><h4><span class="cn">L3</span> Transformer</h4><p>Mění model fungování sebe nebo celého týmu.</p></div>
+      </div>
+      <div class="callout" style="margin-top:14px"><b>Klíč pro adopci:</b> v každém týmu by měl být aspoň jeden <b>builder</b>, ideálně jeden <b>transformer</b>. Rozdíl dělá nástroj: chat → operátoři, co-work/code → buildeři.</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">📚</span> Rychlý rozcestník modulů</h3>
+      <div class="ovmod">
+        <div class="ovcard" data-nav="m1"><div class="on">MODUL 1</div><div class="oh">Jak získat AI mindset</div><div class="od">Základní nastavení myšlení pro práci s AI.</div></div>
+        <div class="ovcard" data-nav="m2"><div class="on">MODUL 2</div><div class="oh">Správné AI nástroje</div><div class="od">Modely vs. nástroje, čtyři kategorie, bezpečnost.</div></div>
+        <div class="ovcard" data-nav="m3"><div class="on">MODUL 3</div><div class="oh">Symbióza s AI</div><div class="od">Vibe working, 90-10, OHIO, hluboká práce.</div></div>
+        <div class="ovcard" data-nav="m4"><div class="on">MODUL 4</div><div class="oh">Druhý mozek</div><div class="od">3C framework, kontext je král, PACT.</div></div>
+        <div class="ovcard" data-nav="m5"><div class="on">MODUL 5</div><div class="oh">Tvorba obsahu s AI</div><div class="od">Styl psaní, HTML místo PPT, idea file.</div></div>
+        <div class="ovcard" data-nav="m6"><div class="on">MODUL 6</div><div class="oh">Akcelerace projektů</div><div class="od">Malé týmy, AI-WBS, transformační workflow.</div></div>
+        <div class="ovcard" data-nav="m7"><div class="on">MODUL 7</div><div class="oh">Vibe coding</div><div class="od">Stavba aplikací bez kódu, 5 fází, infrastruktura.</div></div>
+        <div class="ovcard" data-nav="m8"><div class="on">MODUL 8</div><div class="oh">Chytrá práce s daty</div><div class="od">Data → moudrost, context engineering, nástroje.</div></div>
+        <div class="ovcard" data-nav="m9"><div class="on">MODUL 9</div><div class="oh">Automatizace</div><div class="od">Tři úrovně, agentská workflow, orchestrátoři.</div></div>
+        <div class="ovcard" data-nav="m10"><div class="on">MODUL 10</div><div class="oh">AI trendy</div><div class="od">Lidé, procesy, produkty, technologie, organizace.</div></div>
+      </div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" disabled><span class="pl">Předchozí</span><span class="pv">—</span></button>
+      <button class="pbtn next" data-nav="m1"><span class="pl">Další</span><span class="pv">Modul 1 · AI mindset →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 1 ============ -->
+  <section class="module" data-module="m1">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 1</div>
+      <h2>Jak získat AI mindset</h2>
+      <p class="lead">Vstupní modul o nastavení myšlení: přestat AI vnímat jako hračku a začít ji používat „AI first“ — jako partnera, kterému zadáváme práci, dáváme kontext a iterujeme.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/2gbIsZtq25A" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    
+
+    <div class="card">
+      <h3><span class="ic">🤖</span> K čemu asistenti slouží</h3>
+      <ul class="clean">
+        <li><strong>Custom Instructions — „Naučte AI, kdo jste“:</strong> nastavení kontextu o vaší osobě a práci, aby AI dávala relevantnější výstupy.</li>
+        <li><strong>AI Průvodce nástroji — Osobní konzultant:</strong> pomůže vybrat správný nástroj na konkrétní úkol.</li>
+        <li><strong>Prompt Architect — Tvorba profesionálních promptů:</strong> asistent na psaní kvalitních promptů.</li>
+      </ul>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="ov"><span class="pl">Předchozí</span><span class="pv">← Úvod</span></button>
+      <button class="pbtn next" data-nav="m2"><span class="pl">Další</span><span class="pv">Modul 2 · AI nástroje →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 2 ============ -->
+  <section class="module" data-module="m2">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 2</div>
+      <h2>Jak vybrat a využít správné AI nástroje</h2>
+      <p class="lead">Většina lidí říká „používám ChatGPT“ nebo „mám Copilot“ — ale to není model, to je aplikace. Model je mozek uvnitř a rozhoduje o kvalitě výstupů víc než prompt. Modul učí rozlišovat modely, kategorie nástrojů a bezpečné zacházení s daty.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/iq57ZwGEmq4" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video 2 — „superbusy mód“</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/4BkFqDmqj8s" title="Video 2 — „superbusy mód“"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: MS Copilot a možnosti AI v M365</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/eDrIDO-REGg" title="MS Copilot a možnosti AI v M365"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: Práce s Cursorem (FD)</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/zjQGKaWojL4" title="Práce s Cursorem (FD)"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: Práce s VS Code a GitHub Copilot</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/KU3uIXvqtnQ" title="Práce s VS Code a GitHub Copilot"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m2">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m2">
+      
+      <button type="button" class="active" data-tab="quiz-m2">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="quiz-m2"><div class="quiz-block" data-quiz="m2"><div class="qq" data-qid="m2-q1"><p>1. Který koncept odpovídá popisu: „Jak dobře model zvládá komplexní úkoly. Na špici: Gemini 3, GPT-5.4, Claude Opus — ve velmi podobné …&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q1" /> ⚡ Rychlost</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q1" /> 💰 Cena</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q1" /> 💬 Konverzační</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q1" /> 🧠 Inteligence</label></div><div class="qq" data-qid="m2-q2"><p>2. Který koncept odpovídá popisu: „Jak rychle odpovídá. Klíčové pro automatizace a integrace, kde je potřeba odpověď za vteřiny.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q2" /> 💬 Konverzační</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q2" /> 🧠 Inteligence</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q2" /> ⚡ Rychlost</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q2" /> 💰 Cena</label></div><div class="qq" data-qid="m2-q3"><p>3. Který koncept odpovídá popisu: „Claude Opus je nejdražší. Firmy budou muset řešit AI rozpočty úplně jinak.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q3" /> 💬 Konverzační</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q3" /> 💰 Cena</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q3" /> 🧠 Inteligence</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q3" /> ⚡ Rychlost</label></div><div class="qq" data-qid="m2-q4"><p>4. Který koncept odpovídá popisu: „Chat, brainstorming, analýza, výzkum, deep research. Vstupní bod do světa AI.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q4" /> 🧠 Inteligence</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q4" /> 💰 Cena</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q4" /> 💬 Konverzační</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q4" /> ⚡ Rychlost</label></div><div class="qq" data-qid="m2-q5"><p>5. Který koncept odpovídá popisu: „Vibe coding, agenti, automatizace, práce s daty přímo na počítači.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q5" /> 🧠 Inteligence</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q5" /> ⚡ Rychlost</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q5" /> 🔧 Programovací</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q5" /> 💰 Cena</label></div><div class="qq" data-qid="m2-q6"><p>6. Co znamená pojem „1 · Jednoduché&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q6" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q6" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q6" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q6" /> Překlad, shrnutí, mail Jakýkoliv nástroj a rychlý model</label></div><div class="qq" data-qid="m2-q7"><p>7. Co znamená pojem „2 · Složitější&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q7" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q7" /> Analýza, komplexnější výstupy Top nástroj (Claude, Copilot), rozdělit na kroky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q7" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q7" /> Programovací framework</label></div><div class="qq" data-qid="m2-q8"><p>8. Co znamená pojem „3 · Komplexní&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q8" /> Programování, práce s daty Programovací nástroj (Cursor, Claude Code)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q8" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q8" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q8" /> Programovací framework</label></div><div class="qq" data-qid="m2-q9"><p>9. Tvrzení: Modul obsahuje koncept „🧠 Inteligence&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m2-q9" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m2-q9" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🧠</span> Model vs. aplikace — tři dimenze modelu</h3>
+      <div class="grid">
+        <div class="concept"><h4>🧠 Inteligence</h4><p>Jak dobře model zvládá komplexní úkoly. Na špici: Gemini 3, GPT-5.4, Claude Opus — ve velmi podobné kvalitě.</p></div>
+        <div class="concept"><h4>⚡ Rychlost</h4><p>Jak rychle odpovídá. Klíčové pro automatizace a integrace, kde je potřeba odpověď za vteřiny.</p></div>
+        <div class="concept"><h4>💰 Cena</h4><p>Claude Opus je nejdražší. Firmy budou muset řešit AI rozpočty úplně jinak.</p></div>
+      </div>
+      <div class="callout" style="margin-top:14px"><b>Praktický tip:</b> Když AI nedává dobrou odpověď, první otázka je — <b>jaký model používáte?</b> Přepnutí na lepší model často vyřeší problém bez změny promptu.</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">📊</span> Tři úrovně složitosti úkolu</h3>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Úroveň</th><th>Příklady</th><th>Přístup</th></tr>
+        <tr><td><strong>1 · Jednoduché</strong></td><td>Překlad, shrnutí, mail</td><td>Jakýkoliv nástroj a rychlý model</td></tr>
+        <tr><td><strong>2 · Složitější</strong></td><td>Analýza, komplexnější výstupy</td><td>Top nástroj (Claude, Copilot), rozdělit na kroky</td></tr>
+        <tr><td><strong>3 · Komplexní</strong></td><td>Programování, práce s daty</td><td>Programovací nástroj (Cursor, Claude Code)</td></tr>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🗂️</span> Čtyři kategorie AI nástrojů</h3>
+      <div class="grid">
+        <div class="concept"><h4>💬 Konverzační</h4><p>Chat, brainstorming, analýza, výzkum, deep research. Vstupní bod do světa AI.</p></div>
+        <div class="concept"><h4>🔧 Programovací</h4><p>Vibe coding, agenti, automatizace, práce s daty přímo na počítači.</p></div>
+        <div class="concept"><h4>🎨 Kreativní</h4><p>Obrázky, video, hlas, avatar, lokalizace.</p></div>
+        <div class="concept"><h4>🔗 Orchestrační</h4><p>Workflow, automatizace, integrace, AI agenti.</p></div>
+      </div>
+    </div>
+
+    <details>
+      <summary><span class="sic">💬</span> Konverzační nástroje — přehled</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Nástroj</th><th>K čemu</th><th>Poznámka</th></tr>
+        <tr><td><strong>Claude</strong></td><td>Hlavní chat, analýza dat, Cowork, vibe coding</td><td>Nejchytřejší, nejdražší; neumí obrázky/video</td></tr>
+        <tr><td><strong>ChatGPT</strong></td><td>Chat, obrázky, Canvas, deep research</td><td>Rychlý i přemýšlecí model</td></tr>
+        <tr><td><strong>NotebookLM</strong></td><td>Veřejná data, podcasty, video</td><td>Bezplatný; stovky stránek, generování podcastu</td></tr>
+        <tr><td><strong>Gemini</strong></td><td>Chat, deep research, Google ekosystém</td><td>Řada nových výstupů</td></tr>
+        <tr><td><strong>Copilot</strong></td><td>Chat v Microsoft ekosystému</td><td>Často jediný povolený ve firmách; nově i modely Anthropic</td></tr>
+        <tr><td><strong>Perplexity</strong></td><td>Vyhledávání s AI</td><td>Alternativa k deep research</td></tr>
+      </table></div></div>
+    </details>
+
+    <details>
+      <summary><span class="sic">🤖</span> Co jsou AI agenti — a co nejsou</summary>
+      <div class="dcontent">
+        <p style="color:var(--muted);margin-top:0">Není to virtuální člověk pracující 24/7. Když většina lidí mluví o „agentech“, myslí tím prompt → odpověď v ChatGPT. To agent není.</p>
+        <div class="quote">Agent dostane úkol → naplánuje postup → zrealizuje ho → zreviduje, jestli se to povedlo → pokud ne, opraví a zkusí znovu. Pracuje ve smyčce, dokud úkol nesplní.</div>
+        <p style="color:var(--muted);margin-bottom:0">Reální agenti dnes existují v programovacích nástrojích (Cursor, Claude Code), automatizačních platformách (Relay, Make, n8n) a jako osobní AI asistenti nové generace.</p>
+      </div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">🔐</span> Bezpečnost — jednoduché pravidlo ve třech vrstvách</h3>
+      <div class="grid">
+        <div class="concept"><h4>🟢 Veřejné informace</h4><p>Výroční zprávy, zákony, marketing. Můžete dát kamkoliv.</p></div>
+        <div class="concept"><h4>🟡 Běžná obchodní data</h4><p>90 % diskuzí. Bezpečné v placených nástrojích s vypnutým trénováním.</p></div>
+        <div class="concept"><h4>🔴 Důvěrné informace</h4><p>Potřebují nástroje schválené bezpečnostním oddělením.</p></div>
+      </div>
+      <div class="callout green" style="margin-top:14px"><b>Pravidlo:</b> Bezplatná aplikace = nedávejte citlivé informace. Placená aplikace = vypněte trénování na datech → riziko úniku je téměř nulové.</div>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">① Automatizace vstupního dotazníku v Cursoru</div><div class="sl">Filip analyzoval data z minulého dotazníku a řekl agentovi, ať se napojí na Typeform a postaví dotazník automaticky.</div></div>
+        <div class="story"><div class="sh">② Kalkulačka mzdových nákladů za 5 minut v ChatGPT</div><div class="sl">Účastník si nechal naprogramovat funkční kalkulačku přímo v chatu.</div></div>
+        <div class="story"><div class="sh">③ Lead by example — Groupon</div><div class="sl">CTIO zavedl pravidlo: každý team lead udělá demo, jak postavil agenta na reálném procesu.</div></div>
+        <div class="story"><div class="sh">④ Deep research — hodina, 905 zdrojů</div><div class="sl">Claude pracovalo 1 h 3 min, prohledalo 905 zdrojů a dodalo detailní report se zdroji.</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">⚠️</span> Šest častých chyb</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Chyba</th><th>Řešení</th></tr>
+        <tr><td>Nástroj ≠ model</td><td>Naučte se, kde v každém nástroji přepnout model</td></tr>
+        <tr><td>Rychlý model na komplexní úkol</td><td>Na složitější úkoly přepněte na reasoning</td></tr>
+        <tr><td>Všech 25 požadavků najednou</td><td>Rozdělit na kroky: nejdřív 5, pak 5, pak 5</td></tr>
+        <tr><td>Strach z bezpečnosti</td><td>Proaktivně zjistěte, co je povoleno</td></tr>
+        <tr><td>Chatbot na všechno</td><td>Poznejte hranice a přejděte na programovací nástroj</td></tr>
+        <tr><td>Free nástroje na citlivá data</td><td>Placená verze s vypnutým trénováním</td></tr>
+      </table></div></div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Slovníček pojmů</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Termín</th><th>Vysvětlení</th></tr>
+        <tr><td><strong>AI model</strong></td><td>Mozek za každou AI aplikací (GPT-5.4, Claude Opus, Gemini 3)</td></tr>
+        <tr><td><strong>Reasoning model</strong></td><td>Model s pokročilým přemýšlením — naplánuje si postup</td></tr>
+        <tr><td><strong>Kontextové okno</strong></td><td>Kolik dat AI najednou zpracuje. Větší = víc dokumentů, ale nižší spolehlivost</td></tr>
+        <tr><td><strong>Deep research</strong></td><td>Hloubkový průzkum internetu s reportem a zdroji</td></tr>
+        <tr><td><strong>Asistent</strong></td><td>Uložený prompt + materiály. Claude = Projekt, ChatGPT = GPT, Gemini = Gem</td></tr>
+        <tr><td><strong>Vibe coding</strong></td><td>Slovně popíšete, co chcete, AI to naprogramuje</td></tr>
+        <tr><td><strong>PRD</strong></td><td>Product Requirements Document — vstup pro vibe coding</td></tr>
+        <tr><td><strong>Shadow AI</strong></td><td>Nepovolené AI nástroje mimo firemní politiky</td></tr>
+        <tr><td><strong>Prompt injection</strong></td><td>Bezpečnostní útok škodlivým promptem na integrovanou AI</td></tr>
+        <tr><td><strong>Agent</strong></td><td>AI plánuje, exekuje a kontroluje</td></tr>
+      </table></div></div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💬</span> Hlášky na zapamatování</h3>
+      <div class="quote">„Kvalitní nástroj je řešení devíti z deseti problémů.“</div>
+      <div class="quote">„Největším nebezpečím není AI, ve kterém bych dal dokument — je to AI, které ve firmách nemáme.“</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bt">Bonusové sessions k modulu 2 (video + přepis)</div>
+      <div class="bitem"><b>MS Copilot a možnosti AI v M365</b> — <a href="https://youtu.be/eDrIDO-REGg" target="_blank" rel="noopener">video</a></div>
+      <div class="bitem"><b>Práce s Cursorem (FD)</b> — <a href="https://youtu.be/zjQGKaWojL4" target="_blank" rel="noopener">video</a></div>
+      <div class="bitem"><b>Práce s VS Code a GitHub Copilot</b> — <a href="https://youtu.be/KU3uIXvqtnQ" target="_blank" rel="noopener">video</a></div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m1"><span class="pl">Předchozí</span><span class="pv">← Modul 1</span></button>
+      <button class="pbtn next" data-nav="m3"><span class="pl">Další</span><span class="pv">Modul 3 · Symbióza →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 3 ============ -->
+  <section class="module" data-module="m3">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 3</div>
+      <h2>Jak pracovat v symbióze s AI</h2>
+      <p class="lead">Pět principů nového způsobu práce, kde člověk zadává směr a kontroluje kvalitu, zatímco AI dělá většinu exekuce.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/ITYk-SJmEfI" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Zkrácené video</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/0-62lilw6xE" title="Zkrácené video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: Intro do Claude Code</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/UeOtrTSDyDc" title="Intro do Claude Code"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: Intro do Cursor</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/y18XMDOP_Xg" title="Intro do Cursor"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m3">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m3">
+      
+      <button type="button" class="active" data-tab="quiz-m3">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="quiz-m3"><div class="quiz-block" data-quiz="m3"><div class="qq" data-qid="m3-q1"><p>1. Co znamená pojem „Vibe working&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q1" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q1" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q1" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m3-q1" /> Člověk zadává směr, AI realizuje</label></div><div class="qq" data-qid="m3-q2"><p>2. Co znamená pojem „Princip 90-10&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q2" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q2" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m3-q2" /> AI 90 % práce, člověk 10 %</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q2" /> Programovací framework</label></div><div class="qq" data-qid="m3-q3"><p>3. Co znamená pojem „OHIO&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q3" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m3-q3" /> Only Handle It Once — opakované činnosti zdokumentovat nebo automatizovat</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q3" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m3-q3" /> Cloudové úložiště pro soubory</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🎯</span> Pět principů</h3>
+      <div class="grid">
+        <div class="concept"><h4><span class="cn">1</span> Vibe Working</h4><p>Posun od dělání práce k zadávání práce AI. Člověk určuje cíle a směr, exekuci dělá AI.</p></div>
+        <div class="concept"><h4><span class="cn">2</span> Princip 90-10</h4><p>AI udělá 90 % práce, na člověku je 10 % — ale těm 10 % dáme o to větší lásku.</p></div>
+        <div class="concept"><h4><span class="cn">3</span> OHIO</h4><p>Only Handle It Once — opakovanou činnost uložím, zdokumentuji nebo automatizuji.</p></div>
+        <div class="concept"><h4><span class="cn">4</span> Hluboká práce</h4><p>Největší hodnota vzniká v několika nepřerušovaných hodinách. „Pokud chcete zrychlit, zpomalte.“</p></div>
+        <div class="concept"><h4><span class="cn">5</span> What good looks like</h4><p>Klíčová role člověka: poznat, jak vypadá dobrý výstup. Kombinace zkušenosti, vkusu a odvahy.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">📊</span> Co funguje (Anthropic AI Fluency Index)</h3>
+      <div class="stats">
+        <div class="stat"><div class="sv">4×</div><div class="sl">lepší výstup s více kontextem</div></div>
+        <div class="stat"><div class="sv">2×</div><div class="sl">lepší kvalita s příklady dobrého výstupu</div></div>
+        <div class="stat"><div class="sv">2×</div><div class="sl">lepší výsledek při ujasnění cíle</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">💬</span> Jak mluvit s AI</h3>
+      <ul class="clean">
+        <li><strong>„Analyzuj a navrhni“</strong> místo „udělej“ — nechte AI nejdřív prozkoumat, pak realizovat.</li>
+        <li><strong>„Víš, jak to myslím?“</strong> — ověřte si, že AI chápe váš záměr.</li>
+        <li><strong>„Ať je to pro lidi i pro AI“</strong> — dokumentace v markdownu.</li>
+        <li><strong>„Comprehensive“</strong> — jedno slovo, které zajistí, že AI nic nevynechá.</li>
+        <li><strong>Metapromptování</strong> — nechte AI napsat prompt za vás.</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Deep research workflow</div><div class="sl">Nadiktovaný 30s vzkaz → AI vytvoří prompt → deep research → 3 prompty se zpětnou vazbou → „Připrav zadání pro kolegu.“ Kompletní návod za 10 minut práce.</div></div>
+        <div class="story"><div class="sh">Plánování směn v call centru</div><div class="sl">Tři stránky podmínek + Excel → dva agenti paralelně (GPT-5, Opus) → funkční aplikace na jeden prompt za 30 minut.</div><div class="princip">Dobrý nástroj + nejlepší model + kvalitní data = výsledek na jeden prompt.</div></div>
+        <div class="story"><div class="sh">6h strategická porada s AI</div><div class="sl">Nahrávač na stole → přepis + interní data → paralelně Opus a GPT-5 → dokument takové kvality, že ho ještě ten večer posílal kolegům.</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📊</span> Co říkají účastníci (301 hlasujících)</summary>
+      <div class="dcontent">
+        <div class="stats">
+          <div class="stat"><div class="sv">63 %</div><div class="sl">nadšení z AI</div></div>
+          <div class="stat"><div class="sv">49 %</div><div class="sl">překvapení z výstupů</div></div>
+          <div class="stat"><div class="sv">42 %</div><div class="sl">frustrace z AI</div></div>
+          <div class="stat"><div class="sv">35 %</div><div class="sl">ztráta pojmu o čase</div></div>
+        </div>
+        <div class="callout green">Frustrace je přirozená součást učení — zažívá ji skoro každý druhý. Nejste v tom sami.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Slovníček pojmů</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Termín</th><th>Vysvětlení</th></tr>
+        <tr><td><strong>Vibe working</strong></td><td>Člověk zadává směr, AI realizuje</td></tr>
+        <tr><td><strong>Princip 90-10</strong></td><td>AI 90 % práce, člověk 10 %</td></tr>
+        <tr><td><strong>OHIO</strong></td><td>Only Handle It Once — opakované činnosti zdokumentovat nebo automatizovat</td></tr>
+        <tr><td><strong>Deep work</strong></td><td>Nerušená práce v blocích 1+ hodin</td></tr>
+        <tr><td><strong>What good looks like</strong></td><td>Schopnost poznat kvalitní výstup</td></tr>
+        <tr><td><strong>Metapromptování</strong></td><td>AI napíše nebo vylepší prompt za vás</td></tr>
+        <tr><td><strong>IES framework</strong></td><td>Inspirace → Experimenty → Sdílení</td></tr>
+      </table></div></div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💬</span> Hlášky na zapamatování</h3>
+      <div class="quote">„Těch 90-10 není o tom, že odflákneme práci. Naopak — těm deseti procentům dáme o to větší lásku.“</div>
+      <div class="quote">„Pokud chcete zrychlit, zpomalte.“</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bt">Bonusové sessions k modulu 3 (video + materiály)</div>
+      <div class="bitem"><b>Intro do Claude Code</b> — <a href="https://youtu.be/UeOtrTSDyDc" target="_blank" rel="noopener">video</a></div>
+      <div class="bitem"><b>Intro do Cursor</b> — <a href="https://youtu.be/y18XMDOP_Xg" target="_blank" rel="noopener">video</a></div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m2"><span class="pl">Předchozí</span><span class="pv">← Modul 2</span></button>
+      <button class="pbtn next" data-nav="m4"><span class="pl">Další</span><span class="pv">Modul 4 · Druhý mozek →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 4 ============ -->
+  <section class="module" data-module="m4">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 4</div>
+      <h2>Jak vytvořit druhý mozek pomocí AI</h2>
+      <p class="lead">Druhý mozek není jen úložiště poznámek — je to živý systém, kde ukládáte, čistíte a propojujete znalosti tak, aby s nimi mohli pracovat lidé i AI. Kdo má zdokumentovaný kontext, dostává dramaticky lepší výstupy.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/-NWpK9S1sO8" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m4">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m4">
+      
+      <button type="button" class="active" data-tab="quiz-m4">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="quiz-m4"><div class="quiz-block" data-quiz="m4"><div class="qq" data-qid="m4-q1"><p>1. Který koncept odpovídá popisu: „Kdykoli narazíte na něco užitečného, uložte si to — web jako markdown, přepis schůzky, prompt. Návyk…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q1" /> 🔗 Connect (propojit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q1" /> 🧹 Clean (vyčistit)</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q1" /> 📥 Capture (uložit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q1" /> 📁 Projects</label></div><div class="qq" data-qid="m4-q2"><p>2. Který koncept odpovídá popisu: „Surová data zpracujte s AI: „Vyčisti tento dokument.“ AI navrhne strukturu a vytáhne klíčové body.…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q2" /> 🧹 Clean (vyčistit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q2" /> 📥 Capture (uložit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q2" /> 🔗 Connect (propojit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q2" /> 📁 Projects</label></div><div class="qq" data-qid="m4-q3"><p>3. Který koncept odpovídá popisu: „Vyčištěné informace napojte na AI — přes asistenta, Cowork, Cursor nebo MCP.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q3" /> 🧹 Clean (vyčistit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q3" /> 📁 Projects</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q3" /> 📥 Capture (uložit)</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q3" /> 🔗 Connect (propojit)</label></div><div class="qq" data-qid="m4-q4"><p>4. Který koncept odpovídá popisu: „Jednotlivé projekty, na kterých pracujete.…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q4" /> 📁 Projects</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q4" /> 🔗 Connect (propojit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q4" /> 📥 Capture (uložit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q4" /> 🧹 Clean (vyčistit)</label></div><div class="qq" data-qid="m4-q5"><p>5. Který koncept odpovídá popisu: „Desítky agentů s registrem, který se sám aktualizuje.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q5" /> 🧹 Clean (vyčistit)</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q5" /> 🤖 Agents</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q5" /> 🔗 Connect (propojit)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q5" /> 📥 Capture (uložit)</label></div><div class="qq" data-qid="m4-q6"><p>6. Co znamená pojem „Obsidian&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q6" /> Lokální markdown poznámky Zdarma, napojitelný na AI přes Cowork/Cursor</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q6" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q6" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q6" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m4-q7"><p>7. Co znamená pojem „Notion&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q7" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q7" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q7" /> Poznámky s AI napojením Přes MCP, AI čte i zapisuje</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q7" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m4-q8"><p>8. Co znamená pojem „Cowork (Claude)&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q8" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q8" /> Práce s lokálními soubory a adresáři Nově i pro Microsoft</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q8" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q8" /> Cloudové úložiště pro soubory</label></div><div class="qq" data-qid="m4-q9"><p>9. Tvrzení: Modul obsahuje koncept „📥 Capture (uložit)&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m4-q9" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m4-q9" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🔄</span> 3C Framework — Capture, Clean, Connect</h3>
+      <div class="grid">
+        <div class="concept"><h4>📥 Capture (uložit)</h4><p>Kdykoli narazíte na něco užitečného, uložte si to — web jako markdown, přepis schůzky, prompt. Návyk, ne jednorázová akce.</p></div>
+        <div class="concept"><h4>🧹 Clean (vyčistit)</h4><p>Surová data zpracujte s AI: „Vyčisti tento dokument.“ AI navrhne strukturu a vytáhne klíčové body.</p></div>
+        <div class="concept"><h4>🔗 Connect (propojit)</h4><p>Vyčištěné informace napojte na AI — přes asistenta, Cowork, Cursor nebo MCP.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">📁</span> PACT systém (organizace práce v Cursoru)</h3>
+      <div class="grid">
+        <div class="concept"><h4>📁 Projects</h4><p>Jednotlivé projekty, na kterých pracujete.</p></div>
+        <div class="concept"><h4>🤖 Agents</h4><p>Desítky agentů s registrem, který se sám aktualizuje.</p></div>
+        <div class="concept"><h4>🧠 Context</h4><p>Expertiza, cíle na rok, identita / tone of voice, příklady.</p></div>
+        <div class="concept"><h4>🔧 Tools</h4><p>Naprogramované nástroje pro opakované použití.</p></div>
+      </div>
+    </div>
+
+    <details>
+      <summary><span class="sic">🧰</span> Nástroje pro druhý mozek</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Nástroj</th><th>K čemu</th><th>Poznámka</th></tr>
+        <tr><td><strong>Obsidian</strong></td><td>Lokální markdown poznámky</td><td>Zdarma, napojitelný na AI přes Cowork/Cursor</td></tr>
+        <tr><td><strong>Notion</strong></td><td>Poznámky s AI napojením</td><td>Přes MCP, AI čte i zapisuje</td></tr>
+        <tr><td><strong>Cowork (Claude)</strong></td><td>Práce s lokálními soubory a adresáři</td><td>Nově i pro Microsoft</td></tr>
+        <tr><td><strong>markdown.new</strong></td><td>Stažení webů jako markdown</td><td>Jedno kliknutí</td></tr>
+        <tr><td><strong>Git (Obsidian plugin)</strong></td><td>Synchronizace přes GitHub</td><td>Automatická sync každých 10 minut</td></tr>
+        <tr><td><strong>Firecrawl / Apify</strong></td><td>Hromadné stahování dat z webu</td><td>Apify — český startup</td></tr>
+      </table></div></div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Radek Hájek — týmový Obsidian s Git synchronizací</div><div class="sl">BI manažer v Kofole, tým 6 lidí. Obsidian jako týmový druhý mozek, Git sync každých 10 minut, celý vault napojený na Claude přes Cowork. AI reorganizuje tagy a generuje týdenní newsletter.</div></div>
+        <div class="story"><div class="sh">Petr Vávra — 350 souborů do chatbotu</div><div class="sl">Audio přes Notu, všechny dokumenty přes Cowork do markdownu, odstranění duplicit. Z chaosu vznikla znalostní báze.</div></div>
+        <div class="story"><div class="sh">LinkedIn asistent za 5 minut</div><div class="sl">Zkopíroval 3–8 nejlepších postů → „Analyzuj a udělej zadání pro asistenta, který bude psát v mém stylu.“</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">👥</span> Pět archetypů účastníků</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Archetyp</th><th>Charakteristika</th></tr>
+        <tr><td><strong>1 · „Nemám nic“ (~15 %)</strong></td><td>Papír, tužka. Žádný digitální systém ani AI</td></tr>
+        <tr><td><strong>2 · „Digitální šuplík“ (~35 %)</strong></td><td>OneNote, složky na disku. Hodnota se z nich netěží</td></tr>
+        <tr><td><strong>3 · „Copy-paste válečník“ (~25 %)</strong></td><td>Používá AI, ale kontext předává ručně. Neškáluje</td></tr>
+        <tr><td><strong>4 · „Systém v zárodku“ (~15 %)</strong></td><td>Markdown, začínající struktura, první asistenti</td></tr>
+        <tr><td><strong>5 · „Propojený builder“ (~10 %)</strong></td><td>PACT, markdown standard, Cursor/Cowork napojený na soubory</td></tr>
+      </table></div>
+      <div class="callout" style="margin-top:12px">Jen ~8 % má AI skutečně napojené — a ti reportují dramatické výsledky.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Slovníček pojmů</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Termín</th><th>Vysvětlení</th></tr>
+        <tr><td><strong>Druhý mozek</strong></td><td>Systém pro ukládání, čištění a využívání znalostí pomocí AI</td></tr>
+        <tr><td><strong>3C framework</strong></td><td>Capture, Clean, Connect</td></tr>
+        <tr><td><strong>PARA</strong></td><td>Projects, Areas, Resources, Archives (Tiago Forte)</td></tr>
+        <tr><td><strong>PACT</strong></td><td>Projects, Agents, Context, Tools — Filipův systém v Cursoru</td></tr>
+        <tr><td><strong>Compound engineering</strong></td><td>Po každém úkolu aktualizujete instrukce — systém se zlepšuje</td></tr>
+        <tr><td><strong>MCP</strong></td><td>Model Context Protocol — napojení AI na externí aplikace</td></tr>
+        <tr><td><strong>Handbook</strong></td><td>Centrální znalostní báze týmu/firmy</td></tr>
+        <tr><td><strong>Markdown</strong></td><td>Textový formát se strukturou — preferovaný pro AI</td></tr>
+      </table></div></div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💡</span> Klíčové myšlenky &amp; inspirace</h3>
+      <div class="quote">„Kontext je král. Naštěstí my jsme ti, kteří ten kontext můžou vytvářet.“</div>
+      <div class="quote">„Markdown není formát — je to filozofie. Každý soubor je prompt ready.“</div>
+      <p style="color:var(--muted);margin-bottom:0"><strong>Inspirace:</strong> <a href="https://handbook.gitlab.com/" target="_blank" rel="noopener">GitLab Handbook</a> · <a href="https://every.to/guides/compound-engineering" target="_blank" rel="noopener">Compound Engineering (every.to)</a></p>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m3"><span class="pl">Předchozí</span><span class="pv">← Modul 3</span></button>
+      <button class="pbtn next" data-nav="m5"><span class="pl">Další</span><span class="pv">Modul 5 · Tvorba obsahu →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 5 ============ -->
+  <section class="module" data-module="m5">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 5</div>
+      <h2>Jak tvořit obsah s AI</h2>
+      <p class="lead">Tvorba obsahu s AI není o tom nechat všechno vygenerovat — je to spolupráce, kde vy dáváte směr a finální kontrolu, zatímco AI urychluje realizaci. Klíčem je popsaný vlastní styl, práce po krocích a rozlišování, kdy nechat AI tvořit a kdy ji použít jako partnera.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/kkGVoN-ygc0" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: Video</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/qz8BLcs53kc" title="Video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m5">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m5">
+      <button type="button" class="active" data-tab="tasks-m5">Úkoly</button>
+      <button type="button"  data-tab="quiz-m5">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="tasks-m5"><ul class="task-ui"><li><span class="tn">1</span><span>Vyberte 5–10 svých nejlepších emailů z odeslaných a vytvořte si asistenta na psaní emailů s příklady</span></li><li><span class="tn">2</span><span>Vyzkoušejte Canvas (ChatGPT) nebo Artifact (Claude) — řekněte „nakóduj cenovou nabídku / prezentaci / vizualizaci&quot;</span></li><li><span class="tn">3</span><span>Udělejte screenshot nějakého formuláře nebo úkolu, který odkládáte, a nechte AI navrhnout řešení</span></li><li><span class="tn">4</span><span>Uložte si do druhého mozku jednu věc jako inspiraci (web, grafiku, email) do sekce moodboard</span></li><li><span class="tn">5</span><span>Vytvořte si asistenta na svůj hlavní typ obsahu (LinkedIn posty, prezentace, nabídky) s analýzou stylu a příklady</span></li><li><span class="tn">6</span><span>Vyzkoušejte HTML prezentaci místo PowerPointu — použijte prompt z FAIL portálu</span></li><li><span class="tn">7</span><span>Zaregistrujte se do Relay a vytvořte jednoduchou automatizaci na tvorbu obsahu (500 kreditů zdarma s kódem „fil&quot;)</span></li><li><span class="tn">8</span><span>Projděte si Prompt Base a zvažte nákup jednoho vizuálního stylu pro svou práci</span></li><li><span class="tn">9</span><span>Vyzkoušejte idea file — z jakékoliv konverzace nechte AI vytvořit dokument se záměrem a sdílejte ho s kolegou</span></li><li><span class="tn">10</span><span>Vybudujte si knihovnu promptů a asistentů pro všechny typy obsahu, které pravidelně tvoříte</span></li><li><span class="tn">11</span><span>Přesuňte cenové nabídky / klíčové dokumenty do formátu interaktivních webových stránek</span></li><li><span class="tn">12</span><span>Nastavte automatizaci pro opakovanou tvorbu obsahu (personalizovaná videa, hromadné emaily, reporty)</span></li></ul><p class="share-note">Úkoly jsou tipy k vyzkoušení — postup se nesleduje.</p></div><div class="tab-panel " data-panel="quiz-m5"><div class="quiz-block" data-quiz="m5"><div class="qq" data-qid="m5-q1"><p>1. Který koncept odpovídá popisu: „Buď generuje výstupy za vás, nebo vám dává zpětnou vazbu a pomáhá se zlepšit.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q1" /> 🧱 Dekompozice procesu</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q1" /> 📝 Idea file</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q1" /> 🤖 AI jako tvůrce vs. 🎯 kouč</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q1" /> 🛒 Dovednosti se dají koupit</label></div><div class="qq" data-qid="m5-q2"><p>2. Který koncept odpovídá popisu: „Jaké jsou kroky? Kde může AI pomoct? Potřebuji vůbec tento formát?…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q2" /> 🧱 Dekompozice procesu</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q2" /> 📝 Idea file</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q2" /> 🤖 AI jako tvůrce vs. 🎯 kouč</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q2" /> 🛒 Dovednosti se dají koupit</label></div><div class="qq" data-qid="m5-q3"><p>3. Který koncept odpovídá popisu: „Skills a prompty stáhnete (PromptBase, TypeUI.sh) nebo vytvoříte z vlastního procesu.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q3" /> 🤖 AI jako tvůrce vs. 🎯 kouč</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q3" /> 🛒 Dovednosti se dají koupit</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q3" /> 📝 Idea file</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q3" /> 🧱 Dekompozice procesu</label></div><div class="qq" data-qid="m5-q4"><p>4. Který koncept odpovídá popisu: „Koncept Karpathyho — sdílíte dokument se záměrem; příjemce si ho hodí do své AI.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q4" /> 🤖 AI jako tvůrce vs. 🎯 kouč</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q4" /> 📝 Idea file</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q4" /> 🧱 Dekompozice procesu</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q4" /> 🛒 Dovednosti se dají koupit</label></div><div class="qq" data-qid="m5-q5"><p>5. Který koncept odpovídá popisu: „Rozlišujte, kdy musí být výstup dokonalý a kdy stačí „good enough“.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q5" /> 🤖 AI jako tvůrce vs. 🎯 kouč</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q5" /> 🧱 Dekompozice procesu</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q5" /> 💎 Vědomý imperfekcionalismus</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q5" /> 🛒 Dovednosti se dají koupit</label></div><div class="qq" data-qid="m5-q6"><p>6. Co znamená pojem „Obrázky a grafika&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q6" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q6" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q6" /> 17×</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q6" /> Cloudové úložiště pro soubory</label></div><div class="qq" data-qid="m5-q7"><p>7. Co znamená pojem „Weby a HTML&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q7" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q7" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q7" /> 14×</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q7" /> Programovací framework</label></div><div class="qq" data-qid="m5-q8"><p>8. Tvrzení: Modul obsahuje koncept „🤖 AI jako tvůrce vs. 🎯 kouč&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m5-q8" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m5-q8" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🧩</span> Klíčové koncepty</h3>
+      <div class="grid">
+        <div class="concept"><h4>🤖 AI jako tvůrce vs. 🎯 kouč</h4><p>Buď generuje výstupy za vás, nebo vám dává zpětnou vazbu a pomáhá se zlepšit.</p></div>
+        <div class="concept"><h4>🧱 Dekompozice procesu</h4><p>Jaké jsou kroky? Kde může AI pomoct? Potřebuji vůbec tento formát?</p></div>
+        <div class="concept"><h4>🛒 Dovednosti se dají koupit</h4><p>Skills a prompty stáhnete (PromptBase, TypeUI.sh) nebo vytvoříte z vlastního procesu.</p></div>
+        <div class="concept"><h4>📝 Idea file</h4><p>Koncept Karpathyho — sdílíte dokument se záměrem; příjemce si ho hodí do své AI.</p></div>
+        <div class="concept"><h4>💎 Vědomý imperfekcionalismus</h4><p>Rozlišujte, kdy musí být výstup dokonalý a kdy stačí „good enough“.</p></div>
+        <div class="concept"><h4>🎨 Remix</h4><p>„Normální umělci kopírují. Skvělí umělci kradou.“</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🖥️</span> Nejsilnější poznatek: HTML místo PowerPointu</h3>
+      <p style="margin-top:0;color:var(--muted)">Ze 182 odpovědí byl <strong>HTML místo PowerPointu</strong> jednoznačné #1 (48×). Prezentace, nabídky a reporty jako interaktivní webové stránky.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Bod zlomu účastníků</th><th>Četnost</th></tr>
+        <tr><td><strong>Prezentace</strong> (Gamma, NotebookLM, HTML)</td><td>39×</td></tr>
+        <tr><td><strong>E-maily</strong> s tone of voice</td><td>30×</td></tr>
+        <tr><td><strong>Obrázky a grafika</strong></td><td>17×</td></tr>
+        <tr><td><strong>Weby a HTML</strong></td><td>14×</td></tr>
+      </table></div>
+      <div class="callout green" style="margin-top:14px">„Podklady pro interní školení jako interaktivní webová stránka včetně testu. Totální pecka.“ — a přesně o to jde i u tohoto webu.</div>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Cenové nabídky jako webové stránky</div><div class="sl">HTML šablona + agent → personalizovaná nabídka jako interaktivní web. Příklad: nabídka pro Apple vytvořená v letadle z bodů na mobilu.</div></div>
+        <div class="story"><div class="sh">FAIL Wrapped</div><div class="sl">Statistiky účastníků → AI naprogramovala video (Remotion) s dynamickými animacemi.</div><div class="princip">Skriptový přístup umožňuje masovou personalizaci.</div></div>
+        <div class="story"><div class="sh">Roman — ladění tonality jako HTML soubor</div><div class="sl">Tři hlasy, šest dimenzí hodnocení, matice variant — celé jako lokální HTML soubor. Žádný hosting.</div></div>
+      </div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💡</span> Praktické tipy</h3>
+      <ul class="clean">
+        <li><strong>Analyzujte svůj styl psaní:</strong> 5–10 odeslaných e-mailů → „Analyzuj můj styl a vytvoř prompt, díky kterému budeš psát jako já.“</li>
+        <li><strong>Naučte AI vaše pravidla:</strong> řekněte, kdy tykat a kdy vykat.</li>
+        <li><strong>Screenshot + AI = neodkládejte:</strong> formulář → screenshot → „navrhni texty do těchto sekcí“ → hotovo.</li>
+        <li><strong>Dva kroky, ne jeden:</strong> nejdřív outline / prompty se stylem, teprve pak slidy nebo obrázky.</li>
+      </ul>
+    </div>
+
+    <div class="bonus">
+      <div class="bt">Bonusová session: Jak na lokální AI modely</div>
+      <div class="bitem"><b>Video</b> — <a href="https://youtu.be/qz8BLcs53kc" target="_blank" rel="noopener">video</a></div>
+      <div class="bitem"><b>Lokální AI — srovnání a nástroje</b> — obsah je v UI výše v tomto modulu</div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m4"><span class="pl">Předchozí</span><span class="pv">← Modul 4</span></button>
+      <button class="pbtn next" data-nav="m6"><span class="pl">Další</span><span class="pv">Modul 6 · Projekty →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 6 ============ -->
+  <section class="module" data-module="m6">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 6</div>
+      <h2>Jak akcelerovat projekty s AI</h2>
+      <p class="lead">Malé týmy s AI nahrazují velké korporátní struktury, hranice profesí se rozpouštějí a klíčovou dovedností je práce end-to-end. Nejde jen o zrychlení, ale hlavně o zlepšení díky rychlejší zpětné vazbě.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/KGj0P6Vzwc4" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: AI v Microsoft</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/OIjyblCNrsw" title="AI v Microsoft"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: AI v Google</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/tJPtSNpuqg4" title="AI v Google"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m6">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m6">
+      <button type="button" class="active" data-tab="tasks-m6">Úkoly</button>
+      <button type="button"  data-tab="quiz-m6">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="tasks-m6"><ul class="task-ui"><li><span class="tn">1</span><span>Vyzkoušejte AI-WBS prompt na váš aktuální projekt - rozpadněte ho na podúkoly s AI</span></li><li><span class="tn">2</span><span>Na konci příští AI session řekněte &quot;udělej z toho zprávu pro [kolegu]&quot; a pošlete ji</span></li><li><span class="tn">3</span><span>Udělejte deep research na jedno téma, které aktuálně řešíte</span></li><li><span class="tn">4</span><span>Uložte si prompt na zprávy jako klávesovou zkratku</span></li><li><span class="tn">5</span><span>Popište svůj aktuální projekt do dokumentu a hoďte ho do druhého mozku</span></li><li><span class="tn">6</span><span>Vybudujte si alespoň jeden transformační workflow pro opakovaný proces</span></li><li><span class="tn">7</span><span>Požádejte AI o vytvoření skillu nebo pravidla z posledního dokončeného úkolu</span></li><li><span class="tn">8</span><span>Zkuste si prototyp něčeho, co odkládáte - web, aplikace, automatizace, služba</span></li><li><span class="tn">9</span><span>Zorganizujte mini hackathon s týmem na jeden konkrétní problém (3 hodiny)</span></li><li><span class="tn">10</span><span>Vyzkoušejte idea file jako formát zadání pro kolegu nebo dodavatele</span></li><li><span class="tn">11</span><span>Zaveďte BUF kulturu v týmu - otevřenou komunikaci o způsobu práce s AI</span></li><li><span class="tn">12</span><span>Definujte principy AI-first práce pro váš tým (dokumentace, AI-first přístup, sdílení)</span></li></ul><p class="share-note">Úkoly jsou tipy k vyzkoušení — postup se nesleduje.</p></div><div class="tab-panel " data-panel="quiz-m6"><div class="quiz-block" data-quiz="m6"><div class="qq" data-qid="m6-q1"><p>1. Který koncept odpovídá popisu: „Princip alometrie: čím větší organizace, tím víc energie na provoz. Basecamp (80 lidí) konkuruje nás…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q1" /> 🧱 Chunking bias</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q1" /> ⏱️ Aktivní čas uživatele</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q1" /> 🛠️ Všichni jsme builders</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q1" /> 🏢 Malé týmy s AI</label></div><div class="qq" data-qid="m6-q2"><p>2. Který koncept odpovídá popisu: „Hranice profesí se rozpouštějí. Klíčová vlastnost: high agency.…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q2" /> 🛠️ Všichni jsme builders</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q2" /> 🧱 Chunking bias</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q2" /> 🏢 Malé týmy s AI</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q2" /> ⏱️ Aktivní čas uživatele</label></div><div class="qq" data-qid="m6-q3"><p>3. Který koncept odpovídá popisu: „Neměříme celkový čas, ale minuty u zadání a kontroly.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q3" /> 🛠️ Všichni jsme builders</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q3" /> 🧱 Chunking bias</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q3" /> ⏱️ Aktivní čas uživatele</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q3" /> 🏢 Malé týmy s AI</label></div><div class="qq" data-qid="m6-q4"><p>4. Který koncept odpovídá popisu: „AI zvládne celý blok najednou v jedné session.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q4" /> ⏱️ Aktivní čas uživatele</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q4" /> 🧱 Chunking bias</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q4" /> 🛠️ Všichni jsme builders</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q4" /> 🏢 Malé týmy s AI</label></div><div class="qq" data-qid="m6-q5"><p>5. Který koncept odpovídá popisu: „Každý výstup se stává základem pro opakovaně použitelný systém.…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q5" /> 📈 Compound engineering</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q5" /> ⏱️ Aktivní čas uživatele</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q5" /> 🏢 Malé týmy s AI</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q5" /> 🛠️ Všichni jsme builders</label></div><div class="qq" data-qid="m6-q6"><p>6. Co znamená pojem „AI-WBS&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q6" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q6" /> AI rozpadne projekt na podúkoly s odhady a prompty</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q6" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q6" /> Cloudové úložiště pro soubory</label></div><div class="qq" data-qid="m6-q7"><p>7. Co znamená pojem „Aktivní čas&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q7" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q7" /> Skutečný čas u zadání a kontroly, ne celkový čas projektu</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q7" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q7" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m6-q8"><p>8. Co znamená pojem „Alometrie&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q8" /> Čím větší organismus, tím víc energie na provoz</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q8" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q8" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q8" /> Programovací framework</label></div><div class="qq" data-qid="m6-q9"><p>9. Tvrzení: Modul obsahuje koncept „🏢 Malé týmy s AI&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m6-q9" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m6-q9" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🧩</span> Klíčové koncepty</h3>
+      <div class="grid">
+        <div class="concept"><h4>🏢 Malé týmy s AI</h4><p>Princip alometrie: čím větší organizace, tím víc energie na provoz. Basecamp (80 lidí) konkuruje nástrojům s 1 500–2 500 zaměstnanci.</p></div>
+        <div class="concept"><h4>🛠️ Všichni jsme builders</h4><p>Hranice profesí se rozpouštějí. Klíčová vlastnost: high agency.</p></div>
+        <div class="concept"><h4>⏱️ Aktivní čas uživatele</h4><p>Neměříme celkový čas, ale minuty u zadání a kontroly.</p></div>
+        <div class="concept"><h4>🧱 Chunking bias</h4><p>AI zvládne celý blok najednou v jedné session.</p></div>
+        <div class="concept"><h4>📈 Compound engineering</h4><p>Každý výstup se stává základem pro opakovaně použitelný systém.</p></div>
+        <div class="concept"><h4>📝 Idea file</h4><p>Dokument, který komunikuje CO a PROČ — pochopí ho člověk i AI.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🗺️</span> AI-WBS (AI Work Breakdown Structure)</h3>
+      <p style="margin-top:0;color:var(--muted)">Plánování projektů kalibrované na AI realitu. AI zpochybní a zjednoduší → rozpadne na podúkoly → ke každému přidá odhad aktivního času, typ (AI / hybridně / člověk) a hotový prompt.</p>
+      <div class="callout"><b>Prompt:</b> „Jsi AI-Augmented Project Architect. Popíšu ti projekt a ty mi uděláš strategickou WBS kalibrovanou na AI realitu. Rozlož na fáze a aktivity, ke každé přidej odhad aktivního času, typ a ready-to-use prompt. Nejdřív se zeptej na klíčové otázky.“</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🔄</span> Transformační workflow: 1 hovor → 7 výstupů</h3>
+      <ul class="clean">
+        <li>Přepis → strukturovaná knowledge · Knowledge → brief pro tým · Brief → zpráva do Slacku</li>
+        <li>Knowledge → 1-pager pro management · akční seznam úkolů · evergreen poznámka · LinkedIn post</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">David Lorincz — 51 kreativ najednou</div><div class="sl">Kompletní druhý mozek klienta v Obsidianu. Agent (Claude Code) si sám načetl kontext, navrhl koncepty a složil kreativy — pro 17 služeb 51 kreativ.</div></div>
+        <div class="story"><div class="sh">Jakub Šíma — systém za víkend</div><div class="sl">Za ~36 hodin postavil PACT, převedl poznámky do markdownu a chatbota se 2,25 roku tiketů.</div><div class="princip">Největší bariéra není technická — je to rozhodnutí začít.</div></div>
+        <div class="story"><div class="sh">Filip — napojení dat z FAILu</div><div class="sl">Deep research → AI analýza → build v Cursoru „krok za krokem“ → MCP server, GitHub repozitář, ZIP.</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">⚠️</span> Pět nejčastějších chyb</summary>
+      <div class="dcontent"><ul class="clean">
+        <li><strong>Overthinking místo prototypování</strong> → začněte s AI hned.</li>
+        <li><strong>Plná automatizace od začátku</strong> → začněte poloautomatizací.</li>
+        <li><strong>Ptaní se lidí místo AI</strong> → „Než napíšeš kolegovi, zeptej se AI.“</li>
+        <li><strong>Chybějící dokumentace výstupů</strong> → po každém úkolu „udělej z toho skill“.</li>
+        <li><strong>Ignorování přechodu na Cowork/Code</strong> → pro plný kontext přejděte z chatu.</li>
+      </ul></div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Slovníček pojmů</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Termín</th><th>Vysvětlení</th></tr>
+        <tr><td><strong>AI-WBS</strong></td><td>AI rozpadne projekt na podúkoly s odhady a prompty</td></tr>
+        <tr><td><strong>Aktivní čas</strong></td><td>Skutečný čas u zadání a kontroly, ne celkový čas projektu</td></tr>
+        <tr><td><strong>Alometrie</strong></td><td>Čím větší organismus, tím víc energie na provoz</td></tr>
+        <tr><td><strong>BUF</strong></td><td>Brutálně upřímný feedback o způsobu práce s AI</td></tr>
+        <tr><td><strong>Chunking bias</strong></td><td>Plánování po krocích, přestože AI je zvládne najednou</td></tr>
+        <tr><td><strong>High agency</strong></td><td>Samostatnost a podnikatelský přístup</td></tr>
+        <tr><td><strong>Idea file</strong></td><td>Dokument komunikující záměr pro člověka i AI</td></tr>
+        <tr><td><strong>MCP server</strong></td><td>Napojení dat na AI nástroje</td></tr>
+      </table></div></div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💬</span> Hlášky</h3>
+      <div class="quote">„Budoucností nejsou velké korporace. Jsou to firmy, kde jsou malé týmy, které používají AI.“</div>
+      <div class="quote">„Musíme zpomalit — zpomalit pro to, abychom mohli zrychlit.“</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bt">Bonusové sessions k modulu 6</div>
+      <div class="bitem"><b>AI v Microsoft</b> — <a href="https://youtu.be/OIjyblCNrsw" target="_blank" rel="noopener">video</a></div>
+      <div class="bitem"><b>AI v Google</b> — <a href="https://youtu.be/tJPtSNpuqg4" target="_blank" rel="noopener">video</a></div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m5"><span class="pl">Předchozí</span><span class="pv">← Modul 5</span></button>
+      <button class="pbtn next" data-nav="m7"><span class="pl">Další</span><span class="pv">Modul 7 · Vibe coding →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 7 ============ -->
+  <section class="module" data-module="m7">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 7</div>
+      <h2>Jak stavět vlastní aplikace s AI (vibe coding)</h2>
+      <p class="lead">Vibe coding dává programátorské schopnosti všem. Nepotřebujete umět programovat — potřebujete agency, chuť do toho jít a schopnost spolupracovat s AI. Začnete jednoduše, iterujete a postupně budujete systém s reálnou hodnotou.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/Gkwkn6TF1Xs" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>\n
+      <div class="card">
+        <h3><span class="ic">▶️</span> Bonus: Video</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/n7gRKog-Wr0" title="Video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m7">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m7">
+      <button type="button" class="active" data-tab="tasks-m7">Úkoly</button>
+      <button type="button"  data-tab="quiz-m7">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="tasks-m7"><ul class="task-ui"><li><span class="tn">1</span><span>Vyberte si jeden jednoduchý problém a navibe codujte řešení (kalkulačka, formulář, generátor)</span></li><li><span class="tn">2</span><span>Vyzkoušejte alespoň jeden nástroj z kategorie webových platforem (Macaly, Lovable, Replit)</span></li><li><span class="tn">3</span><span>Udělejte screenshot webu nebo aplikace, která se vám líbí, a hoďte ho do AI s instrukcí &quot;udělej něco podobného&quot;</span></li><li><span class="tn">4</span><span>Pokud máte ChatGPT ve firmě, zeptejte se na přístup ke Codexu</span></li><li><span class="tn">5</span><span>Vytvořte PRD pro jeden reálný projekt (pomocí promptu z FAIL portálu)</span></li><li><span class="tn">6</span><span>Postavte interní nástroj, který reálně používáte v práci</span></li><li><span class="tn">7</span><span>Najděte a integrujte jeden skill do svého AI prostředí</span></li><li><span class="tn">8</span><span>Pokud máte více projektů, vytvořte si centrální rozcestník</span></li><li><span class="tn">9</span><span>Účastněte se speciální session o nasazování (GitHub, Vercel, Supabase)</span></li><li><span class="tn">10</span><span>Navrhněte firemní pravidla pro vibe coding (co interně, co do produkce, kdo kontroluje)</span></li><li><span class="tn">11</span><span>Identifikujte power usera ve svém týmu a investujte do jeho vzdělávání</span></li><li><span class="tn">12</span><span>Zhodnoťte, zda některé legacy systémy (WordPress, Power Automate) nelze nahradit vibe codovanými řešeními</span></li></ul><p class="share-note">Úkoly jsou tipy k vyzkoušení — postup se nesleduje.</p></div><div class="tab-panel " data-panel="quiz-m7"><div class="quiz-block" data-quiz="m7"><div class="qq" data-qid="m7-q1"><p>1. Který koncept odpovídá popisu: „Experimenty, kalkulačky, formuláře.…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q1" /> 🟢 Interní (nízké)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q1" /> 🟡 Zákaznické (střední)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q1" /> 🔴 Kritické (vysoké)</label></div><div class="qq" data-qid="m7-q2"><p>2. Který koncept odpovídá popisu: „Platící zákazníci, napojení na firemní systémy.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q2" /> 🟢 Interní (nízké)</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q2" /> 🟡 Zákaznické (střední)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q2" /> 🔴 Kritické (vysoké)</label></div><div class="qq" data-qid="m7-q3"><p>3. Který koncept odpovídá popisu: „Kód na roky, tisíce uživatelů. Musí dělat programátoři.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q3" /> 🟡 Zákaznické (střední)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q3" /> 🟢 Interní (nízké)</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q3" /> 🔴 Kritické (vysoké)</label></div><div class="qq" data-qid="m7-q4"><p>4. Co znamená pojem „1 · Příprava&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q4" /> Pobavit se s AI, vytvořit PRD, deep research, přidat kontext</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q4" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q4" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q4" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m7-q5"><p>5. Co znamená pojem „2 · Design&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q5" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q5" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q5" /> Screenshot → „udělej něco podobného“. Nejdřív nejlepší model.</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q5" /> Cloudové úložiště pro soubory</label></div><div class="qq" data-qid="m7-q6"><p>6. Co znamená pojem „3 · Prototyp&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q6" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q6" /> První verze rychle; klíč je zpětná vazba (diktováním)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q6" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q6" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m7-q7"><p>7. Tvrzení: Modul obsahuje koncept „🟢 Interní (nízké)&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m7-q7" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m7-q7" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🚦</span> Pět fází vibe coding projektu</h3>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Fáze</th><th>Co se děje</th></tr>
+        <tr><td><strong>1 · Příprava</strong></td><td>Pobavit se s AI, vytvořit PRD, deep research, přidat kontext</td></tr>
+        <tr><td><strong>2 · Design</strong></td><td>Screenshot → „udělej něco podobného“. Nejdřív nejlepší model.</td></tr>
+        <tr><td><strong>3 · Prototyp</strong></td><td>První verze rychle; klíč je zpětná vazba (diktováním)</td></tr>
+        <tr><td><strong>4 · Interní nasazení</strong></td><td>Nástroj používáte reálně. Nejpopulárnější kategorie.</td></tr>
+        <tr><td><strong>5 · Produkce</strong></td><td>Funkčnost, bezpečnost, škálovatelnost — zapojit programátory</td></tr>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">⚖️</span> Tři kategorie podle rizika</h3>
+      <div class="grid">
+        <div class="concept"><h4>🟢 Interní (nízké)</h4><p>Experimenty, kalkulačky, formuláře.</p></div>
+        <div class="concept"><h4>🟡 Zákaznické (střední)</h4><p>Platící zákazníci, napojení na firemní systémy.</p></div>
+        <div class="concept"><h4>🔴 Kritické (vysoké)</h4><p>Kód na roky, tisíce uživatelů. Musí dělat programátoři.</p></div>
+      </div>
+    </div>
+
+    <details>
+      <summary><span class="sic">🧰</span> Doporučené nástroje podle fáze</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Potřeba</th><th>Nástroje</th></tr>
+        <tr><td><strong>První prototyp</strong></td><td>Macaly, Lovable, Replit, Claude Artifacts, ChatGPT Canvas</td></tr>
+        <tr><td><strong>Větší kontrola</strong></td><td>Cursor, Claude Code, Codex, VS Code + Copilot</td></tr>
+        <tr><td><strong>Hezčí design</strong></td><td>Claude Design nebo screenshoty existujících produktů</td></tr>
+        <tr><td><strong>Nasazení</strong></td><td>GitHub + Vercel / GitHub Pages; databáze → Supabase</td></tr>
+      </table></div></div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Filipův generátor certifikátů</div><div class="sl">Začal jedním certifikátem → „udělej to i na šířku“ → „přidej anglickou verzi“. Vznikl vícejazyčný generátor.</div></div>
+        <div class="story"><div class="sh">Jindra — aplikace na správu účtenek</div><div class="sl">Nahrávání účtenek i z telefonu, AI vyčítání, kategorizace, napojení na Gmail a Telegram, export do CSV.</div></div>
+        <div class="story"><div class="sh">Tomáš Hadaš — „Do práce na kole“</div><div class="sl">Stáhl 2 roky e-mailů → Markdown → Opus vytvořil zadání → naprogramoval web. Za dva večery funkční prototyp.</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Slovníček pojmů</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Termín</th><th>Vysvětlení</th></tr>
+        <tr><td><strong>Vibe coding</strong></td><td>Zadáte instrukce v přirozeném jazyce, AI generuje kód</td></tr>
+        <tr><td><strong>PRD</strong></td><td>Product Requirement Documentation</td></tr>
+        <tr><td><strong>Just-in-time software</strong></td><td>Naprogramujete si přesně to, co potřebujete, když to potřebujete</td></tr>
+        <tr><td><strong>Agency</strong></td><td>Chuť a odhodlání pustit se do něčeho nového</td></tr>
+        <tr><td><strong>Skill</strong></td><td>Strukturovaný soubor instrukcí zlepšující výstupy AI</td></tr>
+        <tr><td><strong>Technický dluh</strong></td><td>Nahromaděné problémy v kódu z upřednostnění rychlosti</td></tr>
+      </table></div></div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💬</span> Hlášky na zapamatování</h3>
+      <div class="quote">„Měli bychom se začít připravovat na svět bez programátorů, ve kterém budou programátory úplně všichni.“</div>
+      <div class="quote">„Nejtěžší není to postavit, ale udržovat.“</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bt">Bonusová session: Rozjeďte svůj vibe projekt (infrastruktura)</div>
+      <div class="bitem"><b>Video</b> — <a href="https://youtu.be/n7gRKog-Wr0" target="_blank" rel="noopener">video</a></div>
+      <div class="bitem"><b>Průvodci:</b> — obsah je v UI výše v tomto modulu</div>
+      <div class="bitem"><b>Tři pilíře:</b> — obsah je v UI výše v tomto modulu</div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m6"><span class="pl">Předchozí</span><span class="pv">← Modul 6</span></button>
+      <button class="pbtn next" data-nav="m8"><span class="pl">Další</span><span class="pv">Modul 8 · Data →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 8 ============ -->
+  <section class="module" data-module="m8">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 8</div>
+      <h2>Jak na chytrou práci s daty pomocí AI</h2>
+      <p class="lead">Data jsou ropa — ale pokud s ní nic neděláte, nepřináší hodnotu. S AI přestáváme data jen sbírat a začínáme z nich vytahovat znalosti, rozhodnutí a akce — i bez datového analytika v týmu.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/Bsysd8e0ovU" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m8">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m8">
+      
+      <button type="button" class="active" data-tab="quiz-m8">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="quiz-m8"><div class="quiz-block" data-quiz="m8"><div class="qq" data-qid="m8-q1"><p>1. Co znamená pojem „📊 AI v tabulkách&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q1" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q1" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q1" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m8-q1" /> =COPILOT (Excel), =AI (Sheets) — hromadné zpracování řádků</label></div><div class="qq" data-qid="m8-q2"><p>2. Co znamená pojem „💬 Chat&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q2" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m8-q2" /> Rychlá explorace menších datasetů; vždy nejchytřejší model</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q2" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q2" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m8-q3"><p>3. Co znamená pojem „🤝 Cowork&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m8-q3" /> AI pracuje přímo se soubory; desítky–stovky dokumentů</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q3" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q3" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m8-q3" /> Cloudové úložiště pro soubory</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">📐</span> Pyramida: data → informace → znalost → moudrost</h3>
+      <div class="grid">
+        <div class="concept"><h4><span class="cn">1</span> Data</h4><p>Surová čísla, texty, záznamy.</p></div>
+        <div class="concept"><h4><span class="cn">2</span> Informace</h4><p>Zpracovaná data (na co se lidi ptají?).</p></div>
+        <div class="concept"><h4><span class="cn">3</span> Znalost</h4><p>Porozumění vzorcům.</p></div>
+        <div class="concept"><h4><span class="cn">4</span> Moudrost</h4><p>Rozhodnutí a akce. „Není to o informacích, je to o akcích.“</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🧩</span> Klíčové koncepty</h3>
+      <ul class="clean">
+        <li><strong>Strukturovaná vs. nestrukturovaná data:</strong> tabulky ~20 %, texty/přepisy ~80 % — na ty dnes stačí AI.</li>
+        <li><strong>Tři generace:</strong> manuální tabulky → BI dashboardy → konverzační analytika.</li>
+        <li><strong>Context engineering &gt; prompt engineering:</strong> jak připravit data, aby sloužila AI.</li>
+        <li><strong>AI jako mozek vs. sval:</strong> nahrajte data a zeptejte se „jakou analýzu mi navrhuješ?“.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🧰</span> Čtyři typy nástrojů podle objemu dat</h3>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Typ</th><th>Kdy použít</th></tr>
+        <tr><td><strong>📊 AI v tabulkách</strong></td><td>=COPILOT (Excel), =AI (Sheets) — hromadné zpracování řádků</td></tr>
+        <tr><td><strong>💬 Chat</strong></td><td>Rychlá explorace menších datasetů; vždy nejchytřejší model</td></tr>
+        <tr><td><strong>🤝 Cowork</strong></td><td>AI pracuje přímo se soubory; desítky–stovky dokumentů</td></tr>
+        <tr><td><strong>⌨️ Code</strong></td><td>Cursor, Claude Code — DB, API, tisíce řádků</td></tr>
+      </table></div>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Filipova analýza FAIL portálu v Cursoru</div><div class="sl">Segmentace účastníků, scoring, HTML report s rozklikávatelnými jmény — celé na 6–7 promptů.</div></div>
+        <div class="story"><div class="sh">Pavel Šebesta — optimalizace výroby</div><div class="sl">Nahraje Excel do Claude s připravenými instrukcemi. Z hodin práce na 2 minuty.</div></div>
+        <div class="story"><div class="sh">Radek Juroška (Kofola) — zápisy z porad</div><div class="sl">Přes Apps Script: nahrajete MP3/MP4, systém přepíše a vytvoří strukturovaný zápis s úkoly.</div></div>
+        <div class="story"><div class="sh">Simona B. — automatizované výběrové řízení</div><div class="sl">Claude připravil kritéria, Google Forms a dashboard s real-time pořadím uchazečů.</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="sic">🌐</span> Získávání dat a specializované nástroje</summary>
+      <div class="dcontent">
+        <p style="color:var(--muted);margin-top:0"><strong>Tři cesty:</strong> export ze systémů · API · web scraping (Apify, Firecrawl).</p>
+        <div class="tblwrap"><table class="tbl">
+          <tr><th>Nástroj</th><th>K čemu</th></tr>
+          <tr><td><strong>Python + Streamlit</strong></td><td>Zpracování dat, rychlé dashboardy</td></tr>
+          <tr><td><strong>DuckDB</strong></td><td>Analytická databáze lokálně — SQL nad CSV/Parquet</td></tr>
+          <tr><td><strong>Keboola</strong></td><td>Česká platforma pro datové pipeline</td></tr>
+          <tr><td><strong>Unstructured.io</strong></td><td>Zpracování dokumentů pro RAG</td></tr>
+        </table></div>
+      </div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">✅</span> Doporučený postup</h3>
+      <ul class="clean">
+        <li>Neřešte dokonalost dat — <strong>začněte pracovat</strong>.</li>
+        <li>Nechte AI navrhnout analýzu · nejdřív vyčistěte, pak analyzujte.</li>
+        <li><strong>Jednorázově → ověřit → automatizovat.</strong></li>
+      </ul>
+      <div class="quote" style="margin-top:12px">„Největší hodnota dnes leží v našich konverzacích.“<cite>Filip Drimalka</cite></div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m7"><span class="pl">Předchozí</span><span class="pv">← Modul 7</span></button>
+      <button class="pbtn next" data-nav="m9"><span class="pl">Další</span><span class="pv">Modul 9 · Automatizace →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 9 ============ -->
+  <section class="module" data-module="m9">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 9</div>
+      <h2>Jak automatizovat práci s AI</h2>
+      <p class="lead">Automatizace s AI není jen o zjednodušení — umožňuje získat nové insighty a vytvářet nové produkty. Klíčová otázka: co můžu udělat dnes pro to, abych měl zítra jednodušší práci?</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/gi9ps1IithA" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m9">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m9">
+      
+      <button type="button" class="active" data-tab="quiz-m9">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="quiz-m9"><div class="quiz-block" data-quiz="m9"><div class="qq" data-qid="m9-q1"><p>1. Co znamená pojem „Relay&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q1" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m9-q1" /> Nejjednodušší pro začátečníky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q1" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q1" /> Programovací framework</label></div><div class="qq" data-qid="m9-q2"><p>2. Co znamená pojem „Make&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m9-q2" /> Tisíce konektorů (původně česká firma)</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q2" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q2" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q2" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m9-q3"><p>3. Co znamená pojem „n8n&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q3" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q3" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q3" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m9-q3" /> Open-source, on-premise — klíčové pro korporáty</label></div><div class="qq" data-qid="m9-q4"><p>4. Tvrzení: Modul obsahuje koncept „🚀 Prototypéři&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m9-q4" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m9-q4" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🪜</span> Tři úrovně automatizace</h3>
+      <div class="grid">
+        <div class="concept"><h4><span class="cn">1</span> Poloautomatizace</h4><p>Ručně + AI. Mám asistenta, iteruji. Mám kontrolu (7–20 lidí zvládne chat).</p></div>
+        <div class="concept"><h4><span class="cn">2</span> Batch / průběžná</h4><p>Hromadné zpracování: Relay, Make, n8n, Power Automate.</p></div>
+        <div class="concept"><h4><span class="cn">3</span> Vibe coding</h4><p>Nechat AI naprogramovat celé řešení.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🤖</span> Od workflow k agentskému workflow</h3>
+      <ul class="clean">
+        <li><strong>Klasické workflow</strong> — pevné kroky, bez AI.</li>
+        <li><strong>Jednoduché AI workflow</strong> — vstup → AI krok → výstup. Lineární.</li>
+        <li><strong>Agentské workflow</strong> — agent plánuje, přistupuje k nástrojům, vyhodnocuje, má paměť.</li>
+      </ul>
+      <div class="callout"><b>Framework:</b> nejdřív vyladit → zjednodušit → optimalizovat → <b>teprve potom automatizovat</b>.</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">👥</span> Dva typy lidí a orchestrátor</h3>
+      <div class="grid">
+        <div class="concept"><h4>🚀 Prototypéři</h4><p>Rychle prototypují, staví první verze. Orientovaní na hodnotu.</p></div>
+        <div class="concept"><h4>🛡️ Provozáři</h4><p>Zajišťují, aby automatizace fungovaly a byly spolehlivé.</p></div>
+      </div>
+      <div class="callout" style="margin-top:14px">Každé oddělení potřebuje <b>orchestrátora</b> — člověka, který ovládá vibe coding nebo Make/n8n/Relay a staví automatizace pro celý tým.</div>
+    </div>
+
+    <details>
+      <summary><span class="sic">🧰</span> Automatizační nástroje</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Nástroj</th><th>Poznámka</th></tr>
+        <tr><td><strong>Relay</strong></td><td>Nejjednodušší pro začátečníky</td></tr>
+        <tr><td><strong>Make</strong></td><td>Tisíce konektorů (původně česká firma)</td></tr>
+        <tr><td><strong>n8n</strong></td><td>Open-source, on-premise — klíčové pro korporáty</td></tr>
+        <tr><td><strong>Power Automate / Copilot Studio</strong></td><td>Microsoft ekosystém, stavba agentů</td></tr>
+        <tr><td><strong>Claude Tasks / Routines</strong></td><td>Nejjednodušší cesta: prompt + frekvence</td></tr>
+      </table></div></div>
+    </details>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Indický programátor a 100 000 e-shopů</div><div class="sl">Stáhl 100 000 stránek, AI každému vymyslela aplikaci na míru, hromadně rozeslal — neuvěřitelný response rate.</div></div>
+        <div class="story"><div class="sh">Petr Vávra — n8n automatizace schůzek</div><div class="sl">Nota → cloud → AI analyzuje → uloží → notifikace. JSON importoval do n8n a ladil přes screenshoty.</div></div>
+        <div class="story"><div class="sh">Stanley K — logistika</div><div class="sl">n8n on-premise: sledování zásilek + zpracování mailů + Pohoda. Email dostane, jen když je problém.</div></div>
+      </div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💡</span> Netflix princip</h3>
+      <div class="callout"><b>Netflix „přeskočit intro“</b> šetří 30–40 vteřin na epizodu — v součtu 195 let lidského života <em>každý den</em>. Tři věty, které píšete znovu a znovu, uložte jako asistenta.</div>
+      <div class="quote">„Kdybych měl desetkrát víc práce, co bych dělal?“<cite>Filip Drimalka</cite></div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m8"><span class="pl">Předchozí</span><span class="pv">← Modul 8</span></button>
+      <button class="pbtn next" data-nav="m10"><span class="pl">Další</span><span class="pv">Modul 10 · Trendy →</span></button>
+    </div>
+  </section>
+
+  <!-- ============ MODUL 10 ============ -->
+  <section class="module" data-module="m10">
+    <div class="mhead">
+      <div class="mkicker"><span class="dot"></span> Modul 10 · Závěr</div>
+      <h2>Jak sledovat a využít AI trendy</h2>
+      <p class="lead">Závěrečný modul shrnuje deset týdnů a představuje pět oblastí, kde AI mění pravidla hry: lidé, procesy, produkty, technologie a organizace. Nejde o vzdálené predikce — vše už funguje u top inovátorů dnes.</p>
+    </div>
+
+    
+    <button type="button" class="back-top" data-nav="ov">← Zpět na přehled</button>
+    
+      <div class="card">
+        <h3><span class="ic">▶️</span> Video modulu</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/hrtIncMwdi8" title="Video modulu"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    <div class="card">
+      <h3><span class="ic">📚</span> Obsah modulu</h3>
+      <p style="margin:0;color:var(--muted);font-size:14.5px">Vše důležité je níže přímo v této stránce — koncepty, tipy, příběhy a slovníček. Nemusíte otevírat žádné markdown soubory.</p>
+    </div>
+    <div class="card" id="practice-m10">
+    <h3><span class="ic">🎯</span> Procvičení</h3>
+    <div class="section-tabs" data-tabs="m10">
+      
+      <button type="button" class="active" data-tab="quiz-m10">Kvíz</button>
+    </div><div class="tab-panel active" data-panel="quiz-m10"><div class="quiz-block" data-quiz="m10"><div class="qq" data-qid="m10-q1"><p>1. Který koncept odpovídá popisu: „Čtyři úrovně (Explorer → Transformer), high agency, double major (obor + AI).…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q1" /> 🛠️ Technologie</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q1" /> ⚙️ Procesy</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q1" /> 📦 Produkty</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q1" /> 👤 Lidé</label></div><div class="qq" data-qid="m10-q2"><p>2. Který koncept odpovídá popisu: „OHIO, znovupoužitelné artefakty, skills vs. agenti, human in the loop.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q2" /> 📦 Produkty</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q2" /> ⚙️ Procesy</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q2" /> 🛠️ Technologie</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q2" /> 👤 Lidé</label></div><div class="qq" data-qid="m10-q3"><p>3. Který koncept odpovídá popisu: „Ze SaaS na Service-as-a-Software, headless a agent-ready služby.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q3" /> 👤 Lidé</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q3" /> ⚙️ Procesy</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q3" /> 🛠️ Technologie</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q3" /> 📦 Produkty</label></div><div class="qq" data-qid="m10-q4"><p>4. Který koncept odpovídá popisu: „Chat vs. co-work/code = operátoři vs. buildeři.…&quot;?</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q4" /> 🛠️ Technologie</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q4" /> ⚙️ Procesy</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q4" /> 👤 Lidé</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q4" /> 📦 Produkty</label></div><div class="qq" data-qid="m10-q5"><p>5. Který koncept odpovídá popisu: „Malé týmy s AI, manažer jako motor nebo brzda.…&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q5" /> 📦 Produkty</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q5" /> 👤 Lidé</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q5" /> ⚙️ Procesy</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q5" /> 🏢 Organizace</label></div><div class="qq" data-qid="m10-q6"><p>6. Co znamená pojem „Bifurkace&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q6" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q6" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q6" /> Rozdělení lidí/firem podle úrovně adopce AI</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q6" /> Typ AI modelu pro obrázky</label></div><div class="qq" data-qid="m10-q7"><p>7. Co znamená pojem „Builder / Transformer&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q7" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q7" /> Programovací framework</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q7" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q7" /> Level 2 staví workflow; Level 3 mění model fungování</label></div><div class="qq" data-qid="m10-q8"><p>8. Co znamená pojem „High agency&quot;?</p><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q8" /> Cloudové úložiště pro soubory</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q8" /> Typ AI modelu pro obrázky</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q8" /> Programovací framework</label><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q8" /> Proaktivita — sám se učím, zkouším</label></div><div class="qq" data-qid="m10-q9"><p>9. Tvrzení: Modul obsahuje koncept „👤 Lidé&quot;.</p><label class="quiz-opt" data-correct="true"><input type="radio" name="m10-q9" /> Pravda</label><label class="quiz-opt" data-correct="false"><input type="radio" name="m10-q9" /> Nepravda</label></div><button type="button" class="pbtn next quiz-submit" style="margin-top:8px">Vyhodnotit kvíz</button>
+      <div class="quiz-result"></div></div></div></div>
+
+    <div class="card">
+      <h3><span class="ic">🌐</span> Pět oblastí změny</h3>
+      <div class="grid">
+        <div class="concept"><h4>👤 Lidé</h4><p>Čtyři úrovně (Explorer → Transformer), high agency, double major (obor + AI).</p></div>
+        <div class="concept"><h4>⚙️ Procesy</h4><p>OHIO, znovupoužitelné artefakty, skills vs. agenti, human in the loop.</p></div>
+        <div class="concept"><h4>📦 Produkty</h4><p>Ze SaaS na Service-as-a-Software, headless a agent-ready služby.</p></div>
+        <div class="concept"><h4>🛠️ Technologie</h4><p>Chat vs. co-work/code = operátoři vs. buildeři.</p></div>
+        <div class="concept"><h4>🏢 Organizace</h4><p>Malé týmy s AI, manažer jako motor nebo brzda.</p></div>
+      </div>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Příběhy z praxe</summary>
+      <div class="dcontent">
+        <div class="story"><div class="sh">Pavel Šebesta — AI ve slévárně</div><div class="sl">Dodavatel ERP nacenil tři implementace na 120 000 Kč. Pavel každou zvládl sám za průměrně dva dny.</div></div>
+        <div class="story"><div class="sh">Zapier — minimální bar a 100% adopce</div><div class="sl">Před rokem zavedli minimální bar. O rok později 100% interní adopce.</div></div>
+        <div class="story"><div class="sh">Onboarding vývojáře za tři dny</div><div class="sl">Agent napojený na firemní druhý mozek. „Jsem tady tři dny a mám pocit, jako kdybych tady pracoval rok.“</div></div>
+      </div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">🚀</span> Doporučené kroky pro jednotlivce</h3>
+      <ul class="clean">
+        <li>Představte si, že jdete zítra na pohovor — uměli byste mluvit o tom, jak používáte AI?</li>
+        <li>Budujte si kontext (druhý mozek) soustavně.</li>
+        <li>Snižujte počet věcí, které děláte najednou — deep work &gt; multitasking.</li>
+        <li>Všechno je prompt. Léto = příležitost „pracovat na práci“.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3><span class="ic">🏢</span> Doporučené kroky pro týmy</h3>
+      <ul class="clean">
+        <li>V každém týmu potřebujete aspoň jednoho <strong>buildera</strong>.</li>
+        <li>Adopce AI není jednorázové školení — funguje pravidelné sdílení a ambasadoři.</li>
+        <li>Nastavte minimální bar (jako Zapier).</li>
+        <li>Dejte lidem správné nástroje. Řešte, zda jsou vaše systémy agent-ready (MCP? API?).</li>
+      </ul>
+    </div>
+
+    <details>
+      <summary><span class="sic">📖</span> Slovníček pojmů</summary>
+      <div class="dcontent"><div class="tblwrap"><table class="tbl">
+        <tr><th>Termín</th><th>Vysvětlení</th></tr>
+        <tr><td><strong>Bifurkace</strong></td><td>Rozdělení lidí/firem podle úrovně adopce AI</td></tr>
+        <tr><td><strong>Builder / Transformer</strong></td><td>Level 2 staví workflow; Level 3 mění model fungování</td></tr>
+        <tr><td><strong>High agency</strong></td><td>Proaktivita — sám se učím, zkouším</td></tr>
+        <tr><td><strong>Double major</strong></td><td>Odbornost v oboru + dovednosti v AI</td></tr>
+        <tr><td><strong>Harness</strong></td><td>Celkový systém kolem agenta — kontext, nástroje, rozhodování</td></tr>
+        <tr><td><strong>Service-as-a-Software</strong></td><td>Služby dříve dodávané lidmi dodávají AI agenti</td></tr>
+        <tr><td><strong>Context engineering</strong></td><td>Jaký kontext dostat k AI pro nejlepší výstupy</td></tr>
+        <tr><td><strong>OHIO</strong></td><td>Only Handle It Once — šablony místo opakování</td></tr>
+      </table></div></div>
+    </details>
+
+    <div class="card">
+      <h3><span class="ic">💬</span> Hlášky na zapamatování</h3>
+      <div class="quote">„Budoucnost je tady. Jenom není rovnoměrně distribuovaná.“<cite>William Gibson</cite></div>
+      <div class="quote">„Leadership je akce, nikoli pozice.“ · „Všechno je prompt.“<cite>Filip Drimalka</cite></div>
+      <div class="quote">„Můžeš na AI delegovat práci, ale ne odpovědnost.“<cite>Zapier</cite></div>
+    </div>
+
+    <div class="pager">
+      <button class="pbtn" data-nav="m9"><span class="pl">Předchozí</span><span class="pv">← Modul 9</span></button>
+      <button class="pbtn next" data-nav="ov"><span class="pl">Zpět na</span><span class="pv">Úvod ★</span></button>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div>Přehled programu <strong>Future AI Leader (FAIL) 2026</strong> · lektor Filip Drimalka. Zpracováno ze studijních materiálů, přepisů a prezentací.</div>
+    <div>Interaktivní verze pro sdílení — obsah je přímo v UI, bez markdown souborů.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var navs = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+  var modules = Array.prototype.slice.call(document.querySelectorAll('[data-module]'));
+  var navButtons = Array.prototype.slice.call(document.querySelectorAll('nav.side .navbtn'));
+  var layout = document.querySelector('.layout');
+  var menuBtn = document.getElementById('mobileMenuBtn');
+
+  function show(id){
+    modules.forEach(function(m){ m.classList.toggle('active', m.getAttribute('data-module') === id); });
+    navButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-nav') === id); });
+    if (layout) layout.classList.remove('nav-open');
+    if (history.replaceState) history.replaceState(null, '', '#' + id);
+    if (window.scrollTo) window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  navs.forEach(function(el){
+    el.addEventListener('click', function(){
+      var id = el.getAttribute('data-nav');
+      if(id) show(id);
+    });
+  });
+
+  if (menuBtn && layout) {
+    menuBtn.addEventListener('click', function(){ layout.classList.toggle('nav-open'); });
+  }
+
+  var hash = (location.hash || '#ov').replace(/^#/, '');
+  if (document.querySelector('[data-module="'+hash+'"]')) show(hash);
+  else show('ov');
+
+  window.addEventListener('hashchange', function(){
+    var id = (location.hash || '#ov').replace(/^#/, '');
+    if (document.querySelector('[data-module="'+id+'"]')) show(id);
+  });
+
+  document.querySelectorAll('[data-tabs]').forEach(function(tabs){
+    tabs.querySelectorAll('button[data-tab]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-tab');
+        tabs.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b===btn); });
+        var root = tabs.parentElement;
+        root.querySelectorAll('.tab-panel').forEach(function(p){
+          p.classList.toggle('active', p.getAttribute('data-panel') === id);
+        });
+      });
+    });
+  });
+
+  document.querySelectorAll('.quiz-submit').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var block = btn.closest('.quiz-block');
+      var qs = block.querySelectorAll('.qq');
+      var ok = 0;
+      qs.forEach(function(q){
+        var selected = q.querySelector('input:checked');
+        q.querySelectorAll('.quiz-opt').forEach(function(o){ o.classList.remove('ok','bad'); });
+        if (!selected) return;
+        var label = selected.closest('.quiz-opt');
+        var correct = label.getAttribute('data-correct') === 'true';
+        if (correct) { label.classList.add('ok'); ok++; }
+        else {
+          label.classList.add('bad');
+          var right = q.querySelector('.quiz-opt[data-correct="true"]');
+          if (right) right.classList.add('ok');
+        }
+      });
+      var res = block.querySelector('.quiz-result');
+      res.style.display = 'block';
+      res.textContent = 'Výsledek: ' + ok + ' / ' + qs.length + ' správně (neukládá se)';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
