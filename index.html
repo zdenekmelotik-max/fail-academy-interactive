@@ -212,6 +212,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 .pres-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;
   border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
 .pres-actions{display:flex;gap:8px;flex-wrap:wrap}
+.pdf-open-panel{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:18px 16px;
+  background:linear-gradient(135deg,#1c2333,#3d5afe);color:#fff;text-decoration:none;border-bottom:1px solid var(--border)}
+.pdf-open-panel:hover{filter:brightness(1.06)}
+.pdf-open-panel-title{font-weight:800;font-size:15px}
+.pdf-open-panel-sub{font-size:12.5px;opacity:.85}
 .pdf-frame,.html-frame{width:100%;height:min(75vh,720px);border:0;display:block;background:#525659}
 .prompt-card{margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)}
 .prompt-card h4{margin:0 0 8px;font-size:16px}
@@ -367,11 +372,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-1%2Fprezentace-modul-1.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-1/prezentace-modul-1.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-1%2Fprezentace-modul-1.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-1/prezentace-modul-1.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-1%2Fprezentace-modul-1.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-1%2Fprezentace-modul-1.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-1%2Fprezentace-modul-1.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     <div class="card">
     <h3><span class="ic">🤖</span> Prompty a asistenti</h3>
@@ -384,9 +393,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-0-vjuny">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-0-wnqj8">Kopírovat</button>
         </div>
-        <pre id="prompt-0-vjuny" class="prompt-pre">Jsi můj osobní AI konzultant a průvodce nástroji. Máš hlubokou praktickou znalost všech hlavních AI nástrojů a aplikací. Nejsi teoretik — jsi praktik, který tyto nástroje denně používá a zná jejich reálné možnosti i limity.
+        <pre id="prompt-0-wnqj8" class="prompt-pre">Jsi můj osobní AI konzultant a průvodce nástroji. Máš hlubokou praktickou znalost všech hlavních AI nástrojů a aplikací. Nejsi teoretik — jsi praktik, který tyto nástroje denně používá a zná jejich reálné možnosti i limity.
 
 ## Tvá expertíza
 
@@ -550,9 +559,9 @@ Pokud uživatel teprve začíná a neví, na co se ptát, nabídni:
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-1-oho7z">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-1-zqkrc">Kopírovat</button>
         </div>
-        <pre id="prompt-1-oho7z" class="prompt-pre">Reply briefly and concisely.
+        <pre id="prompt-1-zqkrc" class="prompt-pre">Reply briefly and concisely.
 
 Write clearly - business-like but informal. Don't use overly complex language or sentence structures.
 
@@ -591,9 +600,9 @@ If my instructions noticeably degrade answer quality, explain the issue.</pre>
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-2-bsff0">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-2-zyr35">Kopírovat</button>
         </div>
-        <pre id="prompt-2-bsff0" class="prompt-pre">Jsi elitní prompt inženýr. Tvým úkolem je navrhovat co nejefektivnější, nejpřesnější a kontextově nejchytřejší prompty pro velké jazykové modely (LLM). Pro každý úkol je tvým cílem:
+        <pre id="prompt-2-zyr35" class="prompt-pre">Jsi elitní prompt inženýr. Tvým úkolem je navrhovat co nejefektivnější, nejpřesnější a kontextově nejchytřejší prompty pro velké jazykové modely (LLM). Pro každý úkol je tvým cílem:
 
 - Extrahovat jádro záměru uživatele a přeformulovat ho jako jasný, cílený prompt
 - Strukturovat vstupy tak, aby optimalizovaly uvažování, formátování a kreativitu modelu
@@ -715,11 +724,15 @@ Vždy se ptej: Vyprodukoval by tento prompt nejlepší možný výsledek pro neo
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-2%2Fprezentace-modul-2.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-2/prezentace-modul-2.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-2%2Fprezentace-modul-2.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-2/prezentace-modul-2.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-2%2Fprezentace-modul-2.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-2%2Fprezentace-modul-2.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-2%2Fprezentace-modul-2.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     <div class="card">
     <h3><span class="ic">🤖</span> Prompty a asistenti</h3>
@@ -739,9 +752,9 @@ Stačí jedna věta — např. *„Jaký je aktuální stav adopce AI ve firmác
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-0-dxjy9">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-0-8iuo6">Kopírovat</button>
         </div>
-        <pre id="prompt-0-dxjy9" class="prompt-pre">## Role a identita
+        <pre id="prompt-0-8iuo6" class="prompt-pre">## Role a identita
 
 Jsi research analytik, který pracuje metodou investigativního novináře: nikdy nepřijmeš první výsledek, vždy ověříš z více stran, a odlišíš tvrdá data od odhadů.
 
@@ -812,9 +825,9 @@ Vstup česky → výstup česky. Vstup anglicky → výstup anglicky.
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-1-lcmqv">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-1-za5en">Kopírovat</button>
         </div>
-        <pre id="prompt-1-lcmqv" class="prompt-pre">---
+        <pre id="prompt-1-za5en" class="prompt-pre">---
 
 ## Pravidla výstupu
 
@@ -1044,11 +1057,15 @@ Nabídni:
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-3%2Fprezentace-modul-3.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-3/prezentace-modul-3.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-3%2Fprezentace-modul-3.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-3/prezentace-modul-3.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-3%2Fprezentace-modul-3.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-3%2Fprezentace-modul-3.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-3%2Fprezentace-modul-3.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     <div class="card">
     <h3><span class="ic">🤖</span> Prompty a asistenti</h3>
@@ -1061,9 +1078,9 @@ Nabídni:
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-0-5zh0q">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-0-h8kqv">Kopírovat</button>
         </div>
-        <pre id="prompt-0-5zh0q" class="prompt-pre">Jsi osobní průvodce nástrojem Claude Code od Anthropic. Pomáháš uživatelům — od úplných začátečníků po pokročilé — s instalací, nastavením, používáním a řešením problémů.
+        <pre id="prompt-0-h8kqv" class="prompt-pre">Jsi osobní průvodce nástrojem Claude Code od Anthropic. Pomáháš uživatelům — od úplných začátečníků po pokročilé — s instalací, nastavením, používáním a řešením problémů.
 
 ## Kdo jsi
 Expert na Claude Code s hlubokými znalostmi všech tří prostředí (terminál/CLI, Claude Desktop/Cowork, IDE/Cursor/VS Code), slash příkazů, skills, subagentů, MCP, hooks a oprávnění.
@@ -1187,9 +1204,9 @@ Příkazový řádek — ta černá/bílá obrazovka, do které píšeš příka
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-1-38jb9">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-1-d94el">Kopírovat</button>
         </div>
-        <pre id="prompt-1-38jb9" class="prompt-pre"># Můj projekt
+        <pre id="prompt-1-d94el" class="prompt-pre"># Můj projekt
 
 ## Kdo jsem
 Filip Drimalka — AI konzultant, podnikatel. Píšu česky, technické termíny anglicky.
@@ -1336,11 +1353,15 @@ Filip Drimalka — AI konzultant, podnikatel. Píšu česky, technické termíny
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-4%2Fprezentace-modul-4.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-4/prezentace-modul-4.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-4%2Fprezentace-modul-4.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-4/prezentace-modul-4.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-4%2Fprezentace-modul-4.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-4%2Fprezentace-modul-4.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-4%2Fprezentace-modul-4.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     <div class="card">
     <h3><span class="ic">🤖</span> Prompty a asistenti</h3>
@@ -1351,9 +1372,9 @@ Filip Drimalka — AI konzultant, podnikatel. Píšu česky, technické termíny
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-0-kxqhw">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-0-u8oiy">Kopírovat</button>
         </div>
-        <pre id="prompt-0-kxqhw" class="prompt-pre"># Expert Panel Conductor
+        <pre id="prompt-0-u8oiy" class="prompt-pre"># Expert Panel Conductor
 
 ## Kdo jsi
 
@@ -1539,9 +1560,9 @@ Použij ji, když chceš nad tématem přemýšlet s více expertními perspekti
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-1-t9wjl">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-1-rzbeo">Kopírovat</button>
         </div>
-        <pre id="prompt-1-t9wjl" class="prompt-pre"># Expert Panel Conductor
+        <pre id="prompt-1-rzbeo" class="prompt-pre"># Expert Panel Conductor
 
 ## Metadata
 
@@ -2004,11 +2025,15 @@ Tip for users: For best results, frame your input as a specific question or deci
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-5%2Fprezentace-modul-5.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-5/prezentace-modul-5.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-5%2Fprezentace-modul-5.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-5/prezentace-modul-5.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-5%2Fprezentace-modul-5.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-5%2Fprezentace-modul-5.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-5%2Fprezentace-modul-5.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     <div class="card">
     <h3><span class="ic">🤖</span> Prompty a asistenti</h3>
@@ -2021,9 +2046,9 @@ Tip for users: For best results, frame your input as a specific question or deci
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-0-5dzbt">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-0-bmgjq">Kopírovat</button>
         </div>
-        <pre id="prompt-0-5dzbt" class="prompt-pre">Jsi AI Content Automation Architect — expert na navrhování systémů pro automatizovanou tvorbu obsahu přes API a skripty. Tvým cílem je pomoci komukoliv (i neprogramátorovi) navrhnout workflow pro tvorbu obsahu, který pak implementuje v coding nástroji jako Cursor, Claude Code nebo Codex.
+        <pre id="prompt-0-bmgjq" class="prompt-pre">Jsi AI Content Automation Architect — expert na navrhování systémů pro automatizovanou tvorbu obsahu přes API a skripty. Tvým cílem je pomoci komukoliv (i neprogramátorovi) navrhnout workflow pro tvorbu obsahu, který pak implementuje v coding nástroji jako Cursor, Claude Code nebo Codex.
 
 ## Tvůj přístup
 
@@ -2119,9 +2144,9 @@ Vždy nabídni uživateli minimálně 2-3 úrovně složitosti:
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-1-bjk2c">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-1-i1a1o">Kopírovat</button>
         </div>
-        <pre id="prompt-1-bjk2c" class="prompt-pre">Jsi expert na komunikaci komplexních konceptů. Tvým úkolem je vytvořit &quot;Idea File&quot; — čistý markdown dokument, který komunikuje myšlenku tak, aby si ho kdokoli přečetl, hodil do svého AI nástroje a ten pochopil, co má stavět.
+        <pre id="prompt-1-i1a1o" class="prompt-pre">Jsi expert na komunikaci komplexních konceptů. Tvým úkolem je vytvořit &quot;Idea File&quot; — čistý markdown dokument, který komunikuje myšlenku tak, aby si ho kdokoli přečetl, hodil do svého AI nástroje a ten pochopil, co má stavět.
 
 ## Co je Idea File
 
@@ -2172,9 +2197,9 @@ Tato sekce MUSÍ být v každém idea file — je to &quot;návod k použití&qu
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-2-mwd9k">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-2-0wnvb">Kopírovat</button>
         </div>
-        <pre id="prompt-2-mwd9k" class="prompt-pre">Jsi expert na tvorbu interaktivních HTML prezentací. Převeď jakýkoliv vstupní obsah na profesionální HTML prezentaci jako jeden soubor.
+        <pre id="prompt-2-0wnvb" class="prompt-pre">Jsi expert na tvorbu interaktivních HTML prezentací. Převeď jakýkoliv vstupní obsah na profesionální HTML prezentaci jako jeden soubor.
 
 ## Výstup
 
@@ -2256,9 +2281,9 @@ Fonty: system-ui stack (funguje offline). Sentence case.
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-3-dvxhh">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-3-zdh3z">Kopírovat</button>
         </div>
-        <pre id="prompt-3-dvxhh" class="prompt-pre">Jsi prezentační designér. Převeď jakýkoliv vstupní obsah do strukturovaných slidů, které lze okamžitě zkopírovat do prezentace.
+        <pre id="prompt-3-zdh3z" class="prompt-pre">Jsi prezentační designér. Převeď jakýkoliv vstupní obsah do strukturovaných slidů, které lze okamžitě zkopírovat do prezentace.
 
 ## Tone of Voice
 [SEM VLOŽTE SVŮJ TONE OF VOICE. Pokud nemáte, smažte tuto sekci — AI použije neutrální profesionální styl.]
@@ -2343,9 +2368,9 @@ POZNÁMKY:
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-4-o6a77">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-4-rpsuy">Kopírovat</button>
         </div>
-        <pre id="prompt-4-o6a77" class="prompt-pre">Jsi senior analytik komunikačního stylu. Tvým úkolem je analyzovat texty a vytvořit tak detailní a přesné zadání, že jakýkoli AI nástroj, který ho dostane, bude psát PŘESNĚ v analyzovaném stylu.
+        <pre id="prompt-4-rpsuy" class="prompt-pre">Jsi senior analytik komunikačního stylu. Tvým úkolem je analyzovat texty a vytvořit tak detailní a přesné zadání, že jakýkoli AI nástroj, který ho dostane, bude psát PŘESNĚ v analyzovaném stylu.
 
 ## Tvůj úkol
 
@@ -2535,11 +2560,15 @@ Ideální jsou texty 100-500 slov — e-maily, posty, články, zprávy. Čím r
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-6%2Fprezentace-modul-6.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-6/prezentace-modul-6.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-6%2Fprezentace-modul-6.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-6/prezentace-modul-6.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-6%2Fprezentace-modul-6.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-6%2Fprezentace-modul-6.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-6%2Fprezentace-modul-6.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     <div class="card">
     <h3><span class="ic">🤖</span> Prompty a asistenti</h3>
@@ -2552,9 +2581,9 @@ Ideální jsou texty 100-500 slov — e-maily, posty, články, zprávy. Čím r
       <div class="prompt-box">
         <div class="prompt-toolbar">
           <span>Prompt ke zkopírování</span>
-          <button type="button" class="btn small copy-btn" data-copy="prompt-0-9x5rd">Kopírovat</button>
+          <button type="button" class="btn small copy-btn" data-copy="prompt-0-z71b7">Kopírovat</button>
         </div>
-        <pre id="prompt-0-9x5rd" class="prompt-pre"># AI-WBS: Projektový plán v AI éře
+        <pre id="prompt-0-z71b7" class="prompt-pre"># AI-WBS: Projektový plán v AI éře
 
 Jsi **AI-Augmented Project Architect**. Uživatel ti popíše projekt (stručně nebo s kontextem) a ty mu uděláš strategickou WBS kalibrovanou na AI realitu - ne na lidské timelines.
 
@@ -2782,25 +2811,29 @@ Max 3 úrovně: Projekt → Fáze → Aktivita.
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-7%2Fprezentace-modul-7.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-7/prezentace-modul-7.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-7%2Fprezentace-modul-7.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-7/prezentace-modul-7.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-7%2Fprezentace-modul-7.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-7%2Fprezentace-modul-7.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-7%2Fprezentace-modul-7.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div>
       <div class="pres-item">
         <div class="pres-head">
           <strong>fail 07 vibe coding prezentace</strong>
-          <a class="btn primary small" href="materials/modul-7/fail-07-vibe-coding-prezentace.html" target="_blank" rel="noopener">Otevřít prezentaci</a>
+          <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-7/fail-07-vibe-coding-prezentace.html" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
         </div>
-        <iframe class="html-frame" src="materials/modul-7/fail-07-vibe-coding-prezentace.html" title="fail 07 vibe coding prezentace" loading="lazy"></iframe>
+        <iframe class="html-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-7/fail-07-vibe-coding-prezentace.html" title="fail 07 vibe coding prezentace" loading="lazy"></iframe>
       </div>
       <div class="pres-item">
         <div class="pres-head">
           <strong>vibe coding toolstack</strong>
-          <a class="btn primary small" href="materials/modul-7/vibe-coding-toolstack.html" target="_blank" rel="noopener">Otevřít prezentaci</a>
+          <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-7/vibe-coding-toolstack.html" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
         </div>
-        <iframe class="html-frame" src="materials/modul-7/vibe-coding-toolstack.html" title="vibe coding toolstack" loading="lazy"></iframe>
+        <iframe class="html-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-7/vibe-coding-toolstack.html" title="vibe coding toolstack" loading="lazy"></iframe>
       </div></div></div>
     
     <div class="card">
@@ -2917,18 +2950,22 @@ Max 3 úrovně: Projekt → Fáze → Aktivita.
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-8%2Fprezentace-modul-8.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-8/prezentace-modul-8.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-8%2Fprezentace-modul-8.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-8/prezentace-modul-8.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-8%2Fprezentace-modul-8.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-8%2Fprezentace-modul-8.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-8%2Fprezentace-modul-8.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div>
       <div class="pres-item">
         <div class="pres-head">
           <strong>fail 08 chytra prace s daty</strong>
-          <a class="btn primary small" href="materials/modul-8/fail-08-chytra-prace-s-daty.html" target="_blank" rel="noopener">Otevřít prezentaci</a>
+          <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-8/fail-08-chytra-prace-s-daty.html" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
         </div>
-        <iframe class="html-frame" src="materials/modul-8/fail-08-chytra-prace-s-daty.html" title="fail 08 chytra prace s daty" loading="lazy"></iframe>
+        <iframe class="html-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-8/fail-08-chytra-prace-s-daty.html" title="fail 08 chytra prace s daty" loading="lazy"></iframe>
       </div></div></div>
     
     <div class="card">
@@ -3043,11 +3080,15 @@ Max 3 úrovně: Projekt → Fáze → Aktivita.
         <div class="pres-head">
           <strong>Prezentace (PDF)</strong>
           <div class="pres-actions">
-            <a class="btn primary small" href="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-9%2Fprezentace-modul-9.pdf" target="_blank" rel="noopener">Otevřít prezentaci</a>
-            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-9/prezentace-modul-9.pdf" target="_blank" rel="noopener">Stáhnout PDF</a>
+            <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-9%2Fprezentace-modul-9.pdf" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
+            <a class="btn small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-9/prezentace-modul-9.pdf" download target="_blank" rel="noopener noreferrer">Stáhnout PDF</a>
           </div>
         </div>
-        <iframe class="pdf-frame" src="pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-9%2Fprezentace-modul-9.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
+        <a class="pdf-open-panel" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-9%2Fprezentace-modul-9.pdf" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentaci v novém okně">
+          <span class="pdf-open-panel-title">Klikněte pro otevření prezentace</span>
+          <span class="pdf-open-panel-sub">Otevře se PDF prohlížeč se všemi slidami</span>
+        </a>
+        <iframe class="pdf-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/pdfjs/web/viewer.html?file=https%3A%2F%2Fzdenekmelotik-max.github.io%2Ffail-academy-interactive%2Fmaterials%2Fmodul-9%2Fprezentace-modul-9.pdf" title="Prezentace (PDF)" loading="lazy" allowfullscreen></iframe>
       </div></div></div>
     
     <div class="card">
@@ -3151,9 +3192,9 @@ Max 3 úrovně: Projekt → Fáze → Aktivita.
       <div class="pres-item">
         <div class="pres-head">
           <strong>FAIL M10 prezentace</strong>
-          <a class="btn primary small" href="materials/modul-10/fail-m10-prezentace.html" target="_blank" rel="noopener">Otevřít prezentaci</a>
+          <a class="btn primary small" href="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-10/fail-m10-prezentace.html" target="_blank" rel="noopener noreferrer">Otevřít prezentaci</a>
         </div>
-        <iframe class="html-frame" src="materials/modul-10/fail-m10-prezentace.html" title="FAIL M10 prezentace" loading="lazy"></iframe>
+        <iframe class="html-frame" src="https://zdenekmelotik-max.github.io/fail-academy-interactive/materials/modul-10/fail-m10-prezentace.html" title="FAIL M10 prezentace" loading="lazy"></iframe>
       </div></div></div>
     
     <div class="card">
