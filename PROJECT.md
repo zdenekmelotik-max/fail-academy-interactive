@@ -10,12 +10,13 @@
 | **Lokální zdroj** | `~/Projects/fail-learning-app` |
 | **Zdrojové materiály** | Google Drive → `treninky/FAIL Attachments` |
 | **Jazyk** | Čeština |
+| **Poslední update** | 2026-07-17 — listování PDF prezentací přímo v stránce |
 
 ---
 
 ## Shrnutí
 
-Jednostránková webová aplikace (single HTML) převádí materiály kurzu FAIL do **100% profesionálního UI**: videa, koncepty, příběhy, úkoly a kvízy. Sdílí se odkazem — progress se **nesleduje**.
+Jednostránková webová aplikace převádí materiály kurzu FAIL do **profesionálního UI**: videa, prezentace (PDF), prompty, koncepty, úkoly a kvízy. Sdílí se odkazem — progress se **nesleduje**.
 
 Google Drive odkaz na `.html` často otevře text místo appky; proto běží na **GitHub Pages**.
 
@@ -32,8 +33,14 @@ Google Drive odkaz na `.html` často otevře text místo appky; proto běží na
 
 - 10 modulů programu FAIL
 - YouTube videa embednutá přímo v UI (+ bonus sessions)
+- **Prezentace (PDF)** přes vestavěný PDF.js
+  - listování **Předchozí / Další** přímo na stránce
+  - počítadlo slidů (`N / celkem`)
+  - odkaz **Celá obrazovka** + **Stáhnout PDF**
+  - načtení až po otevření modulu (lazy load)
+- **Prompty** jako karty s tlačítkem Kopírovat
 - Koncepty, tipy, příběhy, slovníčky jako karty
-- Procvičení: úkoly + kvízy (výsledek se neukládá)
+- Procvičení: úkoly + kvízy (správné zeleně ✓, špatné červeně ✗; výsledek se neukládá)
 - Responzivní navigace: menu, Zpět, předchozí/další modul
 - **Žádný raw markdown** jako hlavní obsah
 
@@ -49,18 +56,28 @@ scripts/import-content.mjs  →  public/data/course.json
 scripts/build-shareable-html.mjs
         │
         ▼
-dist/fail-academy-interactive.html
+dist/deploy/
+  ├── index.html          # celá appka
+  ├── materials/modul-N/  # PDF + HTML prezentace
+  └── pdfjs/              # PDF.js viewer
         │
         ├──► GitHub Pages (sdílený odkaz)
-        └──► Drive kopie (záloha, ne pro sdílení odkazem)
+        └──► Drive kopie HTML (záloha, ne pro sdílení odkazem)
 ```
 
 | Vrstva | Technologie |
 |--------|-------------|
-| Publish | Static HTML + CSS + JS (jeden soubor) |
-| Hosting | GitHub Pages |
+| Publish | Static HTML + CSS + JS |
+| Prezentace | Mozilla PDF.js (same-origin embed) |
+| Hosting | GitHub Pages (`fail-academy-interactive`) |
 | Dev (volitelné) | Vite + React v `fail-learning-app` |
-| Data | Extrakce z `ai-future-leaders-akademie.html` + course.json |
+| Data | `ai-future-leaders-akademie.html` + course.json + Drive PDF/MD |
+
+### PDF — důležitá pravidla
+
+- Odkazy na viewer jsou **absolutní** (`https://…/pdfjs/web/viewer.html?file=…`). Relativní `pdfjs/…` se na GitHub Pages bez trailing slash rozbije (404).
+- Zoom `page-width` se nastaví až po načtení PDF.js (hash `#zoom=…` v URL embedu může načítání rozbít).
+- Při otevření modulu se prezentace resetuje na slide 1.
 
 ---
 
@@ -73,7 +90,7 @@ npm run import-content          # obnoví course.json z Drive
 node scripts/build-shareable-html.mjs
 open dist/fail-academy-interactive.html
 # nebo
-npx --yes serve dist -p 8765
+npx --yes serve dist/deploy -p 8765
 ```
 
 Volitelně React MVP: `npm run dev` → http://localhost:5173
@@ -84,10 +101,13 @@ Volitelně React MVP: `npm run dev` → http://localhost:5173
 
 1. Upravte materiály na Google Drive (nebo HTML přehled).
 2. `npm run import-content`
-3. `node scripts/build-shareable-html.mjs`
-4. Zkopírujte `dist/fail-academy-interactive.html` → `dist/deploy/index.html`
-5. V `dist/deploy`: `git add -A && git commit -m "…" && git push`
-6. GitHub Actions nasadí Pages (~1 min).
+3. `node scripts/build-shareable-html.mjs`  
+   (zapíše `dist/deploy/index.html` + zkopíruje materiály)
+4. V `dist/deploy` (publish repo):
+   ```bash
+   git add -A && git commit -m "…" && git push
+   ```
+5. GitHub Actions / Pages nasadí změnu (~1 min). Po update doporučen **hard refresh** (Cmd+Shift+R).
 
 ---
 
