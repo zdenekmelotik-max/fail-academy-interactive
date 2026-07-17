@@ -1,0 +1,2234 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Coding — FAIL Modul 7</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --paper: #faf9f7;
+      --accent: #e94560;
+      --accent-soft: #fce4ec;
+      --blue: #0f3460;
+      --blue-soft: #e3f2fd;
+      --blue-mid: #1a5276;
+      --green: #16813d;
+      --green-soft: #e8f5e9;
+      --orange: #e77f1b;
+      --orange-soft: #fff3e0;
+      --purple: #6c3fa0;
+      --purple-soft: #f3e5f5;
+      --teal: #0e8a7d;
+      --teal-soft: #e0f2f1;
+      --gray-100: #f5f5f5;
+      --gray-200: #eeeeee;
+      --gray-300: #e0e0e0;
+      --gray-500: #9e9e9e;
+      --gray-700: #616161;
+      --radius: 12px;
+      --sidebar-w: 280px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--blue);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      overflow-y: auto;
+      transition: transform 0.3s;
+      transform: translateX(-100%);
+    }
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-header .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    .sidebar-header .client {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.5;
+      margin-top: 4px;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      color: rgba(255,255,255,0.55);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-align: left;
+      width: 100%;
+      line-height: 1.4;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: rgba(255,255,255,0.12); color: white; font-weight: 600; }
+    .nav-item .nav-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      min-width: 22px;
+      opacity: 0.5;
+      padding-top: 1px;
+    }
+    .nav-item.active .nav-num { color: var(--accent); opacity: 1; }
+    .nav-item.sub { padding-left: 52px; font-size: 0.78rem; }
+    .nav-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 8px 20px; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.72rem;
+      opacity: 0.4;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    body.slides-mode { overflow: hidden; height: 100vh; }
+    body.slides-mode .sidebar { transform: translateX(0); }
+    body.slides-mode .main { margin-left: var(--sidebar-w); height: 100vh; }
+    body.slides-mode .slides-wrapper {
+      overflow-y: auto;
+      scroll-snap-type: y proximity;
+      max-width: none;
+      padding: 0;
+      width: 100%;
+      margin: 0;
+    }
+    body.slides-mode .slide {
+      min-height: 100vh;
+      padding: 60px 80px;
+      scroll-snap-align: start;
+      justify-content: center;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    body.slides-mode .slide.slide-hero {
+      margin: 0;
+      padding: 60px 80px;
+      max-width: none;
+      width: 100%;
+    }
+    body.slides-mode .bottom-bar { display: flex; }
+    body.slides-mode .web-nav { display: none !important; }
+
+    body.slides-mode.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+    body.slides-mode.sidebar-collapsed .main { margin-left: 0; }
+
+    body.fullscreen .sidebar { transform: translateX(-100%) !important; }
+    body.fullscreen .main { margin-left: 0 !important; }
+    body.fullscreen .bottom-bar { opacity: 0; transition: opacity 0.2s; }
+    body.fullscreen .bottom-bar:hover { opacity: 1; }
+    body.fullscreen .slide { padding: 60px 120px; max-width: none; }
+    body.fullscreen .slide h2 { font-size: 3rem; }
+    body.fullscreen .slide .lead { font-size: 1.35rem; }
+
+    .web-nav {
+      display: flex;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      border-bottom: 1px solid var(--gray-300);
+      padding: 0 40px;
+      align-items: stretch;
+    }
+    .web-nav-inner {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex: 1;
+      min-width: 0;
+    }
+    .web-nav-btn {
+      padding: 14px 16px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .web-nav-btn:hover { color: var(--blue); background: var(--gray-100); }
+    .web-nav-btn.active { color: var(--blue); border-bottom-color: var(--accent); }
+
+    .mode-fab {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 150;
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 5px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      opacity: 0.55;
+      transition: opacity 0.25s;
+    }
+    .mode-fab:hover { opacity: 1; }
+    .mode-fab button {
+      padding: 7px 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: none;
+      color: var(--gray-500);
+    }
+    .mode-fab button:hover { color: var(--blue); background: var(--gray-100); }
+    .mode-fab button.active { background: var(--blue); color: white; }
+    .mode-fab .fab-sep { width: 1px; background: var(--gray-200); margin: 2px 2px; }
+
+    .main {
+      margin-left: 0;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s;
+    }
+    .slides-wrapper {
+      flex: 1;
+      scroll-behavior: smooth;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+    .slide {
+      min-height: auto;
+      padding: 56px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .slide.slide-hero {
+      background: var(--blue);
+      color: white;
+      max-width: none;
+      margin: 0 -40px;
+      padding: 80px 40px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide.slide-hero::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .bottom-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      background: white;
+      border-top: 1px solid var(--gray-200);
+      flex-shrink: 0;
+    }
+    .slide-counter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+    .nav-buttons { display: flex; gap: 8px; }
+    .nav-btn-slide {
+      padding: 8px 20px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      background: white;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn-slide:hover { background: var(--blue); color: white; border-color: var(--blue); }
+    .nav-btn-slide:disabled { opacity: 0.3; pointer-events: none; }
+
+    .slide-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .slide h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 3rem;
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .slide h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.4rem;
+      font-weight: 400;
+      color: var(--blue);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .slide h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .slide .lead {
+      font-size: 1.2rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      max-width: 720px;
+    }
+    .slide-hero .lead {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.15rem;
+      max-width: 700px;
+    }
+    .slide p { margin: 10px 0; font-size: 1.05rem; line-height: 1.7; }
+    .slide ul, .slide ol { margin: 12px 0 12px 24px; }
+    .slide li { margin: 8px 0; font-size: 1.05rem; line-height: 1.6; }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .stat-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.2rem;
+      display: block;
+    }
+    .hero-stat .stat-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.6;
+    }
+    .version {
+      display: inline-block;
+      align-self: flex-start;
+      width: fit-content;
+      background: var(--accent);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      position: relative; z-index: 1;
+      margin-bottom: 16px;
+    }
+
+    .group-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin: 28px 0;
+      align-items: stretch;
+    }
+    .group-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: box-shadow 0.2s;
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      column-gap: 12px;
+      row-gap: 2px;
+      align-content: start;
+    }
+    .group-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .group-card .group-icon { font-size: 1.5rem; grid-column: 1; grid-row: 1; align-self: center; line-height: 1; }
+    .group-card .group-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--ink);
+      grid-column: 2; grid-row: 1;
+      align-self: center;
+    }
+    .group-card .group-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      grid-column: 2;
+      margin-bottom: 4px;
+    }
+    .group-card .group-desc { font-size: 0.95rem; color: var(--gray-700); line-height: 1.6; grid-column: 1 / -1; margin-top: 6px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin: 24px 0;
+    }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .two-col ul { margin: 8px 0 0 20px; }
+    .two-col li { font-size: 1.05rem; margin: 8px 0; line-height: 1.6; }
+
+    blockquote {
+      background: var(--gray-100);
+      padding: 24px 28px;
+      margin: 14px 0;
+      border-radius: var(--radius);
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    blockquote .quote-author {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--gray-500);
+      margin-top: 10px;
+      display: block;
+      font-style: normal;
+    }
+
+    .flow-phase {
+      background: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 16px 0;
+      border: 1px solid var(--gray-200);
+      position: relative;
+    }
+    .flow-phase .phase-num {
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--blue);
+      color: white;
+      padding: 2px 14px;
+      border-radius: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .flow-phase h4 { margin-top: 8px; margin-bottom: 6px; color: var(--blue); font-size: 1.1rem; }
+    .flow-phase p { font-size: 1rem; color: var(--gray-700); }
+    .flow-phase .phase-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    .highlight-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 16px 0;
+      transition: box-shadow 0.2s;
+    }
+    .highlight-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .highlight-card h4 { font-size: 1.1rem; font-weight: 600; margin: 0 0 8px; color: var(--blue); }
+    .highlight-card p { font-size: 1rem; color: var(--gray-700); margin: 6px 0; }
+
+    .verdict-box {
+      background: linear-gradient(135deg, var(--accent-soft), #fff3e0);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 24px 0;
+    }
+    .verdict-box h3 { color: var(--accent); margin-bottom: 12px; }
+    .verdict-box p { font-size: 1.1rem; font-weight: 500; }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 20px 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+    th {
+      background: var(--blue);
+      color: white;
+      padding: 14px 18px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 1rem;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--gray-100); }
+    td a {
+      color: var(--ink);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 2px solid var(--accent);
+      transition: color 0.15s;
+    }
+    td a:hover { color: var(--accent); }
+
+    .deliverable-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .deliverable-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 2.2rem 1fr;
+      grid-template-rows: auto auto;
+      column-gap: 14px;
+      row-gap: 2px;
+      align-items: start;
+    }
+    .deliverable-card .del-icon { font-size: 1.5rem; grid-row: 1 / -1; align-self: center; }
+    .deliverable-card .del-name { font-weight: 600; font-size: 1.02rem; color: var(--ink); }
+    .deliverable-card .del-desc { font-size: 0.92rem; color: var(--gray-700); line-height: 1.5; }
+
+    .session-row {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 18px;
+      padding: 16px 18px;
+    }
+    .session-row:nth-child(odd) { background: var(--gray-100); }
+    .session-row:first-child { border-radius: 8px 8px 0 0; }
+    .session-row:last-child { border-radius: 0 0 8px 8px; }
+    .session-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .session-title { font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+    .session-desc { font-size: 0.95rem; color: var(--gray-700); margin-top: 2px; }
+
+    .cta-box {
+      background: var(--blue);
+      color: white;
+      border-radius: var(--radius);
+      padding: 48px;
+      text-align: center;
+      margin: 32px 0;
+    }
+    .cta-box h3 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 400; color: white; margin: 0 0 8px; }
+    .cta-box p { color: rgba(255,255,255,0.85); margin: 4px 0; font-size: 1.05rem; }
+    .cta-box a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    .cta-box a:hover { text-decoration: underline; }
+
+    details { margin: 16px 0; border-radius: var(--radius); overflow: hidden; }
+    details summary {
+      cursor: pointer;
+      padding: 16px 22px;
+      background: var(--gray-100);
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--blue);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    details summary:hover { background: var(--gray-200); }
+    details summary::before { content: '▸'; font-size: 0.9rem; transition: transform 0.2s; display: inline-block; }
+    details[open] summary::before { transform: rotate(90deg); }
+    details[open] summary { border-radius: var(--radius) var(--radius) 0 0; background: var(--blue-soft); }
+    .details-content { padding: 20px; background: white; border: 1px solid var(--gray-200); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+
+    .zone-card {
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 12px 0;
+    }
+    .zone-card h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+    .zone-card p { font-size: 1rem; line-height: 1.6; }
+    .zone-card ul { margin: 8px 0 0 20px; }
+    .zone-card li { font-size: 0.95rem; margin: 4px 0; }
+    .zone-green { background: var(--green-soft); border: 1px solid var(--gray-200); }
+    .zone-green h4 { color: var(--green); }
+    .zone-yellow { background: var(--orange-soft); border: 1px solid var(--gray-200); }
+    .zone-yellow h4 { color: var(--orange); }
+    .zone-red { background: var(--accent-soft); border: 1px solid var(--gray-200); }
+    .zone-red h4 { color: var(--accent); }
+
+    .skill-chain {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 28px 0;
+      flex-wrap: wrap;
+    }
+    .skill-step {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+    }
+    .skill-step .step-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .skill-step .step-name { font-weight: 700; font-size: 1.05rem; color: var(--blue); }
+    .skill-arrow {
+      font-size: 1.4rem;
+      color: var(--accent);
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+
+    .myth-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin: 16px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .myth-card .myth-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .myth-card h4 { color: var(--ink); font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+    .myth-card p { font-size: 1rem; color: var(--gray-700); line-height: 1.6; }
+
+    .tool-badge {
+      display: inline-block;
+      background: var(--blue-soft);
+      color: var(--blue);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 3px 2px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .tool-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: box-shadow 0.2s;
+    }
+    .tool-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .tool-card .tool-name { font-weight: 700; font-size: 1rem; color: var(--ink); margin-bottom: 4px; }
+    .tool-card .tool-desc { font-size: 0.92rem; color: var(--gray-700); line-height: 1.5; }
+
+    .tool-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin: 28px 0;
+    }
+    .tool-hero-text h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .tool-hero-text p {
+      font-size: 1.05rem;
+      color: var(--gray-700);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .tool-hero-text ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .tool-hero-text ul li {
+      padding: 6px 0;
+      font-size: 1rem;
+      color: var(--ink);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .tool-hero-text ul li:last-child { border-bottom: none; }
+    .tool-hero-text ul li strong { color: var(--blue); }
+    .tool-hero-preview {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tool-hero-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .tool-hero-preview .preview-placeholder {
+      text-align: center;
+      padding: 24px;
+      color: var(--gray-500);
+      font-size: 0.95rem;
+    }
+    .tool-hero-preview .preview-placeholder .preview-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .graph-container {
+      background: #111118;
+      border-radius: var(--radius);
+      padding: 32px 24px 20px;
+      margin: 20px 0;
+    }
+
+    .resource-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      margin: 8px 0;
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.15s;
+    }
+    .resource-link:hover { border-color: var(--blue); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .resource-link .rl-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .resource-link .rl-desc { font-weight: 400; color: var(--gray-700); font-size: 0.85rem; margin-top: 2px; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .slide { padding: 40px 28px; }
+      .group-grid { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .deliverable-grid { grid-template-columns: 1fr; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .slide h1 { font-size: 2.2rem; }
+      .slide h2 { font-size: 1.8rem; }
+      .skill-chain { flex-direction: column; }
+      .skill-arrow { transform: rotate(90deg); }
+      .mobile-toggle {
+        display: block !important;
+        position: fixed;
+        top: 12px; left: 12px;
+        z-index: 300;
+        background: var(--blue);
+        color: white;
+        border: none;
+        width: 40px; height: 40px;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="mobile-toggle" style="display:none;" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand">Vibe Coding</div>
+    <div class="client">FAIL Modul 7 · Duben 2026</div>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <div class="sidebar-footer">Filip Dřímalka · FAIL 2026</div>
+</div>
+
+<div class="mode-fab" id="modeFab">
+  <button id="fabWeb" class="active" onclick="setMode('web')">Web</button>
+  <button id="fabSlides" onclick="setMode('slides')">Prezentace</button>
+  <div class="fab-sep"></div>
+  <button id="fabFS" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+</div>
+
+<div class="web-nav" id="webNav">
+  <div class="web-nav-inner" id="webNavInner"></div>
+</div>
+
+<div class="main">
+  <div class="slides-wrapper" id="slidesWrapper">
+
+    <!-- ╔══════ 0 · HERO ══════╗ -->
+    <div class="slide slide-hero" data-slide="0" data-title="Úvod">
+      <span class="version">FAIL — Modul 7</span>
+      <h1>Vibe Coding</h1>
+      <p class="lead">Jak stavět digitální produkty s&nbsp;AI — od prvního nápadu přes prototyp až po produkci. Bez znalosti programování (i&nbsp;když technické znalosti a&nbsp;systémové myšlení velmi pomůžou).</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-val">5</span>
+          <span class="stat-label">Fází projektu</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-val">20+</span>
+          <span class="stat-label">Nástrojů</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-val">88 %</span>
+          <span class="stat-label">Úspora času</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-val">200+</span>
+          <span class="stat-label">Analyzovaných projektů</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 01 · DISCLAIMER ══════╗ -->
+    <div class="slide" data-slide="1" data-title="Disclaimer" data-num="01">
+      <div class="slide-num">01</div>
+      <h2>Disclaimer: Nejsem programátor</h2>
+      <p class="lead">Vibe coding je programování — ale úplně jiný koncept. AI programuje, vy dáváte vizi, zpětnou vazbu a&nbsp;orchestrujete celý proces.</p>
+
+      <blockquote style="margin-top: 20px;">
+        „Je tu nový druh programování, kterému říkám ‚vibe coding' — plně se poddáte vibu, přijmete exponenciální zrychlení a&nbsp;zapomenete, že kód vůbec existuje."
+        <span class="quote-author">— Andrej Karpathy (tvůrce pojmu „vibe coding")</span>
+      </blockquote>
+
+      <div class="two-col" style="margin-top: 24px;">
+        <div>
+          <div class="col-label" style="color: var(--green);">Co potřebujete</div>
+          <ul>
+            <li>Představu a&nbsp;schopnost popsat co chcete</li>
+            <li>Ochotu iterovat (hodně) — první verze nebude dokonalá</li>
+            <li>Zvídavost, trpělivost a&nbsp;vytrvalost</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">Co nepotřebujete</div>
+          <ul>
+            <li>Znalost programovacích jazyků</li>
+            <li>Roky zkušeností s&nbsp;technologiemi</li>
+            <li>IT vzdělání (systémové a&nbsp;technické myšlení se VELMI hodí)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 02 · KLÍČOVÉ KONCEPTY ══════╗ -->
+    <div class="slide" data-slide="2" data-title="Klíčové koncepty" data-num="02">
+      <div class="slide-num">02</div>
+      <h2>Klíčové koncepty</h2>
+      <p class="lead">Tři stavební kameny, které potřebujete pochopit dřív, než začnete stavět cokoli s&nbsp;AI.</p>
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">🎯</div>
+          <div class="group-name">Agency</div>
+          <div class="group-subtitle">Autonomie + Efficacy</div>
+          <div class="group-desc">Schopnost formulovat vlastní cíle a&nbsp;dotáhnout je do konce. S&nbsp;AI máte obojí — ptáte se, dokud vám to není jasné, a&nbsp;pak to AI pomůže realizovat.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">⚡</div>
+          <div class="group-name">Citizen Developer</div>
+          <div class="group-subtitle">Nová generace tvůrců</div>
+          <div class="group-desc">Člověk bez formálního programátorského vzdělání, který díky no-code, low-code a&nbsp;vibe coding nástrojům staví digitální produkty. Od produktových manažerů po marketéry.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🔧</div>
+          <div class="group-name">Just-in-time Software</div>
+          <div class="group-subtitle">Software na míru, právě teď</div>
+          <div class="group-desc">Místo hledání existujícího nástroje necháte AI naprogramovat přesně to, co potřebujete, přesně v&nbsp;tu chvíli. Koncept od zakladatele Replitu.</div>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p>V&nbsp;éře AI může kdokoli okopírovat vaši funkci za dny nebo hodiny. Technická složitost přestává být konkurenční výhodou. Jediná udržitelná výhoda je <strong>rychlost učení a&nbsp;iterace</strong>.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 02.1 · PRO KOHO ══════╗ -->
+    <div class="slide" data-slide="3" data-title="Pro koho je vibe coding" data-sub="true">
+      <div class="slide-num">02.1</div>
+      <h2>Pro koho je vibe coding</h2>
+      <p class="lead">Není to jen pro vývojáře. Vibe coding mění pravidla hry pro každého, kdo potřebuje digitální nástroje.</p>
+
+      <div class="group-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="group-card">
+          <div class="group-icon">🚀</div>
+          <div class="group-name">Byznys profesionálové</div>
+          <div class="group-desc">Chtějí rychle a&nbsp;levně ověřit nápad. Vytvořit prototyp nebo automatizaci za víkend místo měsíců. Usnadnit si práci nebo zjistit, jestli má projekt smysl dřív, než do toho investují více času či financí.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🎯</div>
+          <div class="group-name">Produktoví manažeři</div>
+          <div class="group-desc">Chtějí experimentovat s&nbsp;funkcemi bez front na vývojáře. Vyzkoušet si nápad hned, ukázat týmu a&nbsp;pak teprve investovat čas vývojářů.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">⚡</div>
+          <div class="group-name">Provozní týmy</div>
+          <div class="group-subtitle">Marketing, HR, Sales</div>
+          <div class="group-desc">Chtějí automatizovat svoje procesy sami. Vytvořit si nástroj přesně pro svoje potřeby. Spustit kampaň nebo systém za hodiny, ne týdny.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">✨</div>
+          <div class="group-name">Tvůrci a&nbsp;konzultanti</div>
+          <div class="group-desc">Staví nové produkty jako svůj byznys. Pomáhají firmám vytvářet aplikace a&nbsp;automatizace. Nabízí služby, které dřív vyžadovaly celý vývojářský tým.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 03 · VÝHODY VIBE CODINGU ══════╗ -->
+    <div class="slide" data-slide="3" data-title="Výhody vibe codingu" data-num="03">
+      <div class="slide-num">03</div>
+      <h2>Tři výhody vibe codingu</h2>
+      <p class="lead">Proč se vyplatí naučit se stavět digitální produkty s&nbsp;AI — i&nbsp;když nejste programátor.</p>
+
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">⚡</div>
+          <div class="group-name">Agilita na steroidech</div>
+          <div class="group-subtitle">Ne do úterka, ale do oběda</div>
+          <div class="group-desc">Rychlost není cíl — je to prostředek k&nbsp;rychlejšímu učení. Fungující prototyp za hodiny místo týdnů. Done&nbsp;>&nbsp;perfect. Ship to think.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🧩</div>
+          <div class="group-name">Rozšíření kompetencí</div>
+          <div class="group-subtitle">Z uživatele tvůrce</div>
+          <div class="group-desc">Nejen chatovat s&nbsp;AI — reálně programovat. Vytvořit web, aplikaci, automatizaci. Dovednost dřív vyžadující vývojářský tým je teď dostupná produktovým manažerům, marketérům i&nbsp;konzultantům.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🚀</div>
+          <div class="group-name">Digitalizace</div>
+          <div class="group-subtitle">Nová příležitost</div>
+          <div class="group-desc">Zvýšení produktivity není „použiju AI jako chat". Je to naprogramovat něco, co digitalizuje celý proces — od ručního třídění faktur k&nbsp;fungující aplikaci. Od excelovské tabulky k&nbsp;interaktivnímu dashboardu.</div>
+        </div>
+      </div>
+
+      <blockquote>
+        „Častokrát, když něco budeme potřebovat, tak nevyužijeme AI, aby nám udělala ten úkol, ale aby naprogramovala řešení, které nám s&nbsp;tím úkolem pomůže."
+      </blockquote>
+    </div>
+
+    <!-- ╔══════ 03.1 · KDY CO ══════╗ -->
+    <div class="slide" data-slide="7" data-title="Kdy využít co" data-sub="true">
+      <div class="slide-num">03.1</div>
+      <h2>Kdy využít co a&nbsp;na co</h2>
+      <p class="lead">Nejde o&nbsp;to umět všechno — jde o&nbsp;to vědět, co existuje a&nbsp;kdy co použít.</p>
+
+      <div class="group-grid">
+        <div class="group-card zone-green" style="background: var(--green-soft);">
+          <div class="group-icon">🟢</div>
+          <div class="group-name">Zelená</div>
+          <div class="group-subtitle">Doporučeno</div>
+          <div class="group-desc">Prototypy, interní nástroje pro sebe/tým, marketingové experimenty. Žádný dohled.
+            <ul style="margin: 10px 0 0 16px; font-size: 0.92rem;">
+              <li>Skript na zpracování účtenek</li>
+              <li>Web jako lead magnet</li>
+              <li>Klikací demo pro investory</li>
+            </ul>
+          </div>
+        </div>
+        <div class="group-card zone-yellow" style="background: var(--orange-soft);">
+          <div class="group-icon">🟡</div>
+          <div class="group-name">Žlutá</div>
+          <div class="group-subtitle">Opatrně</div>
+          <div class="group-desc">MVP s&nbsp;platícími zákazníky, interní nástroje napojené na firemní systémy. Doporučena revize kódu.
+            <ul style="margin: 10px 0 0 16px; font-size: 0.92rem;">
+              <li>První verze SaaS (10–50 uživatelů)</li>
+              <li>Dashboard napojený na CRM</li>
+              <li>Booking systém s&nbsp;platbami</li>
+            </ul>
+          </div>
+        </div>
+        <div class="group-card zone-red" style="background: var(--accent-soft);">
+          <div class="group-icon">🔴</div>
+          <div class="group-name">Červená</div>
+          <div class="group-subtitle">Nedoporučeno</div>
+          <div class="group-desc">Kritické systémy, citlivá data, legacy systémy. Profesionální vývoj.
+            <ul style="margin: 10px 0 0 16px; font-size: 0.92rem;">
+              <li>Bankovní systém</li>
+              <li>Autentizace pro tisíce lidí</li>
+              <li>ERP</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 03.2 · RIZIKA A MÝTY ══════╗ -->
+    <div class="slide" data-slide="9" data-title="Rizika a mýty" data-sub="true">
+      <div class="slide-num">03.2</div>
+      <h2>Rizika a&nbsp;mýty vibe codingu</h2>
+      <p class="lead">Co vám nikdo na sociálních sítích neřekne — a&nbsp;šest rizik, která je potřeba znát.</p>
+
+      <div class="two-col" style="margin-top: 16px;">
+        <div>
+          <div class="highlight-card" style="margin-top: 0;">
+            <h4>🔒 Bezpečnost a citlivá data</h4>
+            <p>AI může generovat nebezpečný kód. V&nbsp;zelené zóně minimální riziko, u dat jiných lidí nechte kód zkontrolovat.</p>
+          </div>
+          <div class="highlight-card">
+            <h4>📈 Škálovatelnost</h4>
+            <p>Funguje v&nbsp;prototypu, padá při reálné zátěži. Pro větší projekty konzultujte s&nbsp;odborníky.</p>
+          </div>
+          <div class="highlight-card">
+            <h4>🔧 Údržba a opravy</h4>
+            <p>Nikdo neví, jak to funguje. U jednorázových nevadí, u dlouhodobých investujte do dokumentace.</p>
+          </div>
+        </div>
+        <div>
+          <div class="highlight-card" style="margin-top: 0;">
+            <h4>🎭 Iluze hotového projektu</h4>
+            <p>90 % máte rychle, posledních 10 % je drtivá většina práce. Uvědomte si to dopředu.</p>
+          </div>
+          <div class="highlight-card">
+            <h4>⚖️ Compliance a právo</h4>
+            <p>Vlastnictví kódu, GDPR...pro interní nástroje minimální riziko, pozor na zákaznické produkty.</p>
+          </div>
+          <div class="highlight-card">
+            <h4>💰 Závislost a náklady</h4>
+            <p>Per-usage pricing překvapí. Replit: 0,1–2 USD za akci. Sledujte náklady od začátku.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="myth-card" style="margin-top: 20px;">
+        <div class="myth-label">Pravidlo 90/10</div>
+        <h4>Prvních 90 % projektu zvládnete snadno</h4>
+        <p>Posledních 10 % (databáze, škálování, přihlašování, bezpečnost) může být drtivá většina práce. Filip to nazývá „iluzí hotového projektu". VIBE = Very Inefficient But Entertaining.</p>
+      </div>
+
+      <h3 style="margin-top: 28px;">Graf štěstí vibe kodéra</h3>
+      <div class="graph-container">
+        <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+          <!-- Grid lines -->
+          <line x1="60" y1="280" x2="660" y2="280" stroke="#333" stroke-width="1"/>
+          <line x1="60" y1="280" x2="60" y2="30" stroke="#333" stroke-width="1"/>
+
+          <!-- Vibe zone background -->
+          <defs>
+            <pattern id="dots" width="12" height="12" patternUnits="userSpaceOnUse">
+              <circle cx="6" cy="6" r="1.5" fill="rgba(255,255,255,0.15)"/>
+            </pattern>
+            <clipPath id="vibeClip">
+              <path d="M60,260 C80,260 100,120 140,60 C180,30 240,30 280,40 C320,55 340,80 360,140 L360,280 L60,280 Z"/>
+            </clipPath>
+          </defs>
+          <rect x="60" y="30" width="300" height="250" fill="url(#dots)" clip-path="url(#vibeClip)"/>
+          <text x="160" y="150" fill="rgba(255,255,255,0.5)" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600">Vibe</text>
+          <text x="160" y="172" fill="rgba(255,255,255,0.5)" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600">zone</text>
+
+          <!-- Progress (white) -->
+          <path d="M60,260 C90,240 110,80 160,50 C200,30 260,30 300,50 C340,80 370,200 420,240 C470,260 530,200 580,140 C620,100 650,80 660,70" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Complexity (blue/purple) -->
+          <path d="M60,270 C100,268 160,265 220,260 C280,250 320,220 380,150 C420,100 460,60 520,45 C570,38 620,35 660,34" fill="none" stroke="#7B8CFF" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Happiness (orange) -->
+          <path d="M60,50 C100,48 160,50 220,55 C280,65 320,100 370,160 C410,210 430,240 460,250 C500,255 540,220 580,160 C620,110 650,70 660,55" fill="none" stroke="#FF8C42" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- X axis label -->
+          <text x="360" y="315" fill="#666" font-family="IBM Plex Sans, sans-serif" font-size="14" text-anchor="middle">Time</text>
+
+          <!-- Legend -->
+          <line x1="170" y1="330" x2="195" y2="330" stroke="white" stroke-width="2.5"/>
+          <text x="200" y="335" fill="#999" font-family="IBM Plex Sans, sans-serif" font-size="12">Progress</text>
+          <line x1="290" y1="330" x2="315" y2="330" stroke="#7B8CFF" stroke-width="2.5"/>
+          <text x="320" y="335" fill="#7B8CFF" font-family="IBM Plex Sans, sans-serif" font-size="12">Complexity</text>
+          <line x1="420" y1="330" x2="445" y2="330" stroke="#FF8C42" stroke-width="2.5"/>
+          <text x="450" y="335" fill="#FF8C42" font-family="IBM Plex Sans, sans-serif" font-size="12">Happiness</text>
+        </svg>
+      </div>
+
+      <blockquote>
+        „Ten začátek, ten prototyp, ta první verze, je extrémně jednoduchá, zvládne to AI. Ten konec už často krade."
+      </blockquote>
+    </div>
+
+    <!-- ╔══════ 03.3 · PRO MANAŽERY A LÍDRY ══════╗ -->
+    <div class="slide" data-slide="10" data-title="Pro manažery a lídry" data-sub="true">
+      <div class="slide-num">03.3</div>
+      <h2>Strategický dopad: Pro manažery a&nbsp;lídry</h2>
+      <p class="lead">Co vyplývá z&nbsp;vibe codingu pro vaši organizaci — a&nbsp;co s&nbsp;tím můžete udělat.</p>
+
+      <div style="margin-top: 20px;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div>
+            <div class="session-title">Dejte lidem systém, ne jen nástroje</div>
+            <div class="session-desc">Připravené prostředí (šablony, pravidla, příklady) dramaticky zvýší adopci. Umožněte interní publikování i&nbsp;sdílení mimo organizaci.</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div>
+            <div class="session-title">Zkuste věci dělat jinak</div>
+            <div class="session-desc">Od prezentací přes cenové nabídky po interní reporty. Ptejte se: „dá se to vibe codovat?"</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div>
+            <div class="session-title">Z&nbsp;klíčových talentů udělejte vibe codery</div>
+            <div class="session-desc">Investujte do lidí, kteří mají motivaci a&nbsp;zvědavost. Jeden dobrý vibe coder změní celé oddělení.</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div>
+            <div class="session-title">Najímejte buildery</div>
+            <div class="session-desc">Ať už děláte v&nbsp;HR, IT nebo v&nbsp;salesu — hledejte lidi, kteří umí stavět, ne jen používat hotové nástroje.</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">05</div>
+          <div>
+            <div class="session-title">Řešte rizika od začátku</div>
+            <div class="session-desc">Začít je jednoduché, ale rizika nelze brát na lehkou váhu. Bezpečnost, škálovatelnost, údržba — definujte pravidla dřív než vznikne problém.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict-box" style="margin-top: 28px; background: linear-gradient(135deg, var(--blue-soft), var(--teal-soft)); border-color: var(--blue);">
+        <p>💡 <strong>Doporučujeme min. 1 power usera na tým</strong> — člověka, který je schopný stavět aplikace, nástroje a&nbsp;automatizace. Ostatní mohou využívat to, co vytvoří — a&nbsp;power user se stává prostředníkem mezi byznysem a&nbsp;IT.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 04 · CO SE DÁ DĚLAT ══════╗ -->
+    <div class="slide" data-slide="10" data-title="Co se dá dělat" data-num="04">
+      <div class="slide-num">04</div>
+      <h2>Co se dá s&nbsp;vibe codingem dělat</h2>
+      <p class="lead">Přehled toho, co dnes reálně postavíte — s&nbsp;konkrétními příklady z&nbsp;praxe.</p>
+
+      <table style="margin-top: 20px;">
+        <tr>
+          <th>Typ</th>
+          <th>Co to umí</th>
+          <th>Příklad z&nbsp;praxe</th>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>📱 Mikro-aplikace</strong></td>
+          <td>Jednoúčelový webový nástroj — formulář, kalkulačka, dashboard</td>
+          <td><a href="https://fail-2025.vercel.app/fail25-001-hana-fialkova" target="_blank" style="color: var(--accent);">247 personalizovaných certifikátů pro účastníky FAIL 2025</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>💰 Cenové nabídky</strong></td>
+          <td>Automatické generování personalizovaných nabídek pro klienty</td>
+          <td><a href="https://www.aipredictions.cz/offer/pluxee" target="_blank" style="color: var(--accent);">aipredictions.cz/offer/pluxee</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>🔧 Interní nástroje</strong></td>
+          <td>Nástroje pro tým — správa obsahu, dokumentace, zpracování dat</td>
+          <td><a href="https://md.aibility.cz" target="_blank" style="color: var(--accent);">md.aibility.cz</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>🌐 Weby</strong></td>
+          <td>Plnohodnotné webové stránky s&nbsp;databází, autentizací a&nbsp;logikou</td>
+          <td><a href="https://www.aipredictions.cz/" target="_blank" style="color: var(--accent);">aipredictions.cz</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>📱 Aplikace</strong></td>
+          <td>Webové aplikace s&nbsp;přihlášením, Stripe platbami, členskou sekcí</td>
+          <td><a href="https://drimalka.vercel.app/" target="_blank" style="color: var(--accent);">drimalka.vercel.app</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>📊 Datové reporty</strong></td>
+          <td>Automatické zpracování dat z&nbsp;více zdrojů, vizualizace, PDF export</td>
+          <td><a href="https://www.aipredictions.cz/aimpact25-26/vysledky" target="_blank" style="color: var(--accent);">aipredictions.cz/aimpact25-26/vysledky</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>🔗 Rozcestník</strong></td>
+          <td>Přehledná stránka s&nbsp;odkazy pro klienty nebo partnery</td>
+          <td><a href="https://drimalka.vercel.app/" target="_blank" style="color: var(--accent);">drimalka.vercel.app</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>🤖 Nástroje s&nbsp;AI</strong></td>
+          <td>Aplikace využívající AI — generování, analýza, zpracování</td>
+          <td><a href="https://aistudio.google.com/" target="_blank" style="color: var(--accent);">Google AI Studio</a></td>
+        </tr>
+        <tr>
+          <td style="white-space: nowrap;"><strong>📑 Prezentace</strong></td>
+          <td>Interaktivní HTML prezentace s&nbsp;navigací, dual-mode</td>
+          <td>Tato prezentace — celá vytvořená vibe codingem</td>
+        </tr>
+      </table>
+
+      <div class="highlight-card" style="margin-top: 20px;">
+        <h4>⚙️ Skripty, automatizace a&nbsp;API napojení</h4>
+        <p>S&nbsp;vibe codingem lze také automatizovat opakované úkoly, čistit data, propojovat systémy nebo napojovat API. Toto téma budeme podrobně probírat v&nbsp;modulu <strong>Automatizace</strong>.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05 · NÁSTROJE ══════╗ -->
+    <div class="slide" data-slide="11" data-title="Nástroje" data-num="05">
+      <div class="slide-num">05</div>
+      <h2>Nástroje</h2>
+      <p class="lead">Tři kategorie nástrojů — webové platformy, AI asistovaný vývoj a&nbsp;specializované služby.</p>
+
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">🌐</div>
+          <div class="group-name">Webové platformy</div>
+          <div class="group-subtitle">Klikací, v&nbsp;prohlížeči</div>
+          <div class="group-desc">Popisujete, co chcete, platforma generuje kompletní webovou aplikaci včetně databáze a&nbsp;všech funkcí.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">💻</div>
+          <div class="group-name">AI asistovaný vývoj</div>
+          <div class="group-subtitle">Na počítači</div>
+          <div class="group-desc">Vývojové prostředí, které funguje jako inteligentní partner. Vy zadáte požadavek, AI programuje.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🧩</div>
+          <div class="group-name">Specializované</div>
+          <div class="group-subtitle">Design, hosting, backend</div>
+          <div class="group-desc">Nástroje pro konkrétní část procesu — design, databáze, nasazení, platby. Stavební bloky pro vibe kodéry.</div>
+        </div>
+      </div>
+
+      <p style="margin-top: 12px;">Klíčové rozhodnutí: někdy je jednodušší použít no-code nástroj (Typeform, Airtable) než vibe codovat od nuly. Znát celé spektrum a&nbsp;vybrat správný nástroj pro správný úkol.</p>
+    </div>
+
+    <!-- ╔══════ 05.1 · WEBOVÉ PLATFORMY – INTRO ══════╗ -->
+    <div class="slide" data-slide="12" data-title="Webové platformy" data-sub="true">
+      <div class="slide-num">05.1</div>
+      <h2>Webové platformy</h2>
+      <p class="lead">Popisujete, co chcete — platforma generuje kompletní webovou aplikaci.</p>
+
+      <div class="tool-hero">
+        <div class="tool-hero-text">
+          <h3>Vše v&nbsp;prohlížeči, žádná instalace</h3>
+          <p>Otevřete web, popíšete co chcete, a&nbsp;za minuty máte fungující aplikaci s&nbsp;databází, přihlašováním a&nbsp;hostingem.</p>
+          <ul>
+            <li><strong>✓</strong> Kompletní aplikace včetně databáze a&nbsp;hostingu</li>
+            <li><strong>✓</strong> Žádná instalace — vše běží v&nbsp;prohlížeči</li>
+            <li><strong>✓</strong> Sdílení jedním odkazem</li>
+            <li><strong>✓</strong> Od prototypu po produkci na jednom místě</li>
+            <li><strong>✓</strong> Ideální pro první projekty a&nbsp;rychlé MVP</li>
+          </ul>
+        </div>
+        <div class="tool-hero-preview">
+          <a href="https://lovable.dev" target="_blank" style="display: block;">
+            <img src="lovable-preview.png" alt="Lovable — AI App Builder" style="width: 100%; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.1a · WEBOVÉ PLATFORMY – DETAIL ══════╗ -->
+    <div class="slide" data-slide="12" data-title="Webové platformy — přehled" data-sub="true">
+      <div class="slide-num">05.1a</div>
+      <h2>Webové platformy — přehled</h2>
+      <p class="lead">Klikací nástroje v&nbsp;prohlížeči — od prototypu po hotovou aplikaci.</p>
+
+      <table>
+        <tr>
+          <th>Nástroj</th>
+          <th>Popis</th>
+        </tr>
+        <tr>
+          <td><a href="https://replit.com/" target="_blank">Replit</a></td>
+          <td>Kompletní platforma — DB, přihlášení, hosting, AI agent. Pro jednoúčelové nástroje a&nbsp;služby pro klienty.</td>
+        </tr>
+        <tr>
+          <td><a href="https://lovable.dev/" target="_blank">Lovable</a></td>
+          <td>Rychlost a&nbsp;hezký design z&nbsp;první verze. MVP, rychlé prototypy, prezentační weby.</td>
+        </tr>
+        <tr>
+          <td><a href="https://www.base44.com/" target="_blank">Base44</a></td>
+          <td>All-in-one s&nbsp;built-in backendem. Full-stack webové aplikace bez externích služeb.</td>
+        </tr>
+        <tr>
+          <td><a href="https://aistudio.google.com/" target="_blank">Google AI&nbsp;Studio</a></td>
+          <td>AI funkce přímo v&nbsp;aplikaci, hodně zadarmo. Aplikace s&nbsp;AI uvnitř (generování, chatboty).</td>
+        </tr>
+        <tr>
+          <td><a href="https://www.macaly.com/" target="_blank">Macaly</a></td>
+          <td>Vizuální builder s&nbsp;AI. Interní nástroje, CRM-like aplikace, workflow automatizace.</td>
+        </tr>
+      </table>
+
+      <h3 style="margin-top: 28px;">Rychlé prototypy bez platformy</h3>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-name">🎨 <a href="https://claude.ai/" target="_blank" style="color: var(--ink); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent);">Claude Artifacts</a></div>
+          <div class="tool-desc">Nejrychlejší start, zero setup. Grafy, kalkulačky, hry, vizualizace — rovnou v&nbsp;chatu.</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name">✏️ <a href="https://chatgpt.com/" target="_blank" style="color: var(--ink); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent);">ChatGPT Canvas</a></div>
+          <div class="tool-desc">Interaktivní editor přímo v&nbsp;ChatGPT. Úpravy kódu i&nbsp;textu v&nbsp;reálném čase, ideální pro jednoduché aplikace.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ╔══════ 05.2 · AI ASISTOVANÝ VÝVOJ – INTRO ══════╗ -->
+    <div class="slide" data-slide="13" data-title="AI asistovaný vývoj" data-sub="true">
+      <div class="slide-num">05.2</div>
+      <h2>AI asistovaný vývoj</h2>
+      <p class="lead">Vývojové prostředí na vašem počítači, které funguje jako inteligentní partner.</p>
+
+      <div class="tool-hero">
+        <div class="tool-hero-text">
+          <h3>Plná kontrola, neomezené možnosti</h3>
+          <p>Aplikace na vašem počítači, kde AI programuje a&nbsp;vy řídíte směr. Maximální flexibilita pro komplexní projekty.</p>
+          <ul>
+            <li><strong>✓</strong> Plná kontrola nad kódem a&nbsp;architekturou</li>
+            <li><strong>✓</strong> Práce s&nbsp;lokálními soubory, dokumenty, daty</li>
+            <li><strong>✓</strong> Napojení na libovolné API a&nbsp;služby</li>
+            <li><strong>✓</strong> Agenti — AI řeší celé úkoly autonomně</li>
+          </ul>
+        </div>
+        <div class="tool-hero-preview">
+          <img src="cursor-preview.png" alt="Cursor — AI asistovaný vývoj">
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.2a · AI ASISTOVANÝ VÝVOJ – DETAIL ══════╗ -->
+    <div class="slide" data-slide="13" data-title="AI asistovaný vývoj — přehled" data-sub="true">
+      <div class="slide-num">05.2a</div>
+      <h2>AI asistovaný vývoj — přehled</h2>
+      <p class="lead">Vývojové prostředí na vašem počítači, které funguje jako inteligentní partner.</p>
+
+      <table>
+        <tr>
+          <th>Nástroj</th>
+          <th>Popis</th>
+        </tr>
+        <tr>
+          <td><a href="https://www.cursor.com/" target="_blank">Cursor</a></td>
+          <td>Nejkomplexnější agent v&nbsp;lokálním prostředí. Filipův nástroj č.&nbsp;1 — dokumenty, data, agenti, Toolkit.</td>
+        </tr>
+        <tr>
+          <td><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">Claude Code</a></td>
+          <td>Příkazový řádek, raw power. Terminal-first workflow.</td>
+        </tr>
+        <tr>
+          <td><a href="https://github.com/features/copilot" target="_blank">GitHub Copilot</a></td>
+          <td>Integrace do IDE, nejnižší cena ($10/měsíc). Pro firmy s&nbsp;GitHub ekosystémem — audit logy, SSO.</td>
+        </tr>
+        <tr>
+          <td><a href="https://openai.com/index/introducing-codex/" target="_blank">Codex (OpenAI)</a></td>
+          <td>Autonomní AI agent pro kódování. Cloud-based vývoj, paralelní úkoly.</td>
+        </tr>
+        <tr>
+          <td><a href="https://idx.google.com/" target="_blank">Google Antigravity</a></td>
+          <td>Agent-native IDE od Google. Enterprise přes Google AI Ultra for Business.</td>
+        </tr>
+        <tr>
+          <td><a href="https://code.visualstudio.com/" target="_blank">VS Code</a></td>
+          <td>Nejrozšířenější editor + GitHub Copilot. Velká šance získat v&nbsp;korporátu — firmy už často mají licence.</td>
+        </tr>
+      </table>
+
+    </div>
+
+    <!-- ╔══════ 05.3 · SPECIALIZOVANÉ NÁSTROJE – INTRO ══════╗ -->
+    <div class="slide" data-slide="14" data-title="Specializované nástroje" data-sub="true">
+      <div class="slide-num">05.3</div>
+      <h2>Specializované nástroje</h2>
+      <p class="lead">Stavební bloky, které vibe kodéři kombinují — design, backend, hosting, platby.</p>
+
+      <div class="tool-hero">
+        <div class="tool-hero-text">
+          <h3>Stavební bloky pro váš projekt</h3>
+          <p>Služby, které řeší konkrétní části projektu — od designu přes databázi po nasazení na internet.</p>
+          <ul>
+            <li><strong>✓</strong> Design — AI navrhne UI, vy upravíte</li>
+            <li><strong>✓</strong> Backend — databáze, přihlašování, API bez vlastního serveru</li>
+            <li><strong>✓</strong> Hosting — aplikace online jedním klikem</li>
+            <li><strong>✓</strong> Platby — checkout a&nbsp;předplatné</li>
+            <li><strong>✓</strong> Kombinujte dle potřeby — nemusíte vše najednou</li>
+          </ul>
+        </div>
+        <div class="tool-hero-preview">
+          <div class="preview-placeholder">
+            <span class="preview-icon">🧩</span>
+            Náhled služby (Supabase / Vercel)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.3a · SPECIALIZOVANÉ NÁSTROJE – DETAIL ══════╗ -->
+    <div class="slide" data-slide="14" data-title="Specializované nástroje — přehled" data-sub="true">
+      <div class="slide-num">05.3a</div>
+      <h2>Specializované nástroje — přehled</h2>
+      <p class="lead">Stavební bloky, které vibe kodéři kombinují — design, backend, hosting, platby.</p>
+
+      <table>
+        <tr>
+          <th>🎨 Design</th>
+          <th>🗄️ Backend</th>
+          <th>🚀 Hosting</th>
+        </tr>
+        <tr>
+          <td style="font-size: 0.88rem; color: var(--gray-500); padding-bottom: 8px;">Jak to bude vypadat — UI, komponenty, prototypy</td>
+          <td style="font-size: 0.88rem; color: var(--gray-500); padding-bottom: 8px;">Kde žijí data — databáze, přihlašování, API</td>
+          <td style="font-size: 0.88rem; color: var(--gray-500); padding-bottom: 8px;">Kde to běží — nasazení aplikace na internet</td>
+        </tr>
+        <tr>
+          <td style="padding-top: 16px; padding-bottom: 20px; line-height: 2.2;">
+            <a href="https://claude.ai/artifacts" target="_blank">Claude Design</a><br>
+            <a href="https://www.figma.com/make/" target="_blank">Figma Make</a><br>
+            <a href="https://stitch.withgoogle.com/" target="_blank">Google Stitch</a><br>
+            <a href="https://ui.shadcn.com/" target="_blank">Shadcn/ui</a> · <a href="https://magicui.design/" target="_blank">MagicUI</a>
+          </td>
+          <td style="padding-top: 16px; padding-bottom: 20px; line-height: 2.2;">
+            <a href="https://supabase.com/" target="_blank">Supabase</a><br>
+            <a href="https://firebase.google.com/" target="_blank">Firebase</a><br>
+            <a href="https://neon.tech/" target="_blank">Neon</a><br>
+            <a href="https://clerk.com/" target="_blank">Clerk</a> · <a href="https://auth0.com/" target="_blank">Auth0</a>
+          </td>
+          <td style="padding-top: 16px; padding-bottom: 20px; line-height: 2.2;">
+            <a href="https://vercel.com/" target="_blank">Vercel</a><br>
+            <a href="https://www.netlify.com/" target="_blank">Netlify</a><br>
+            <a href="https://pages.cloudflare.com/" target="_blank">Cloudflare Pages</a><br>
+            <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>
+          </td>
+        </tr>
+      </table>
+
+      <div class="tool-grid" style="margin-top: 20px;">
+        <div class="tool-card">
+          <div class="tool-name">💳 Platby</div>
+          <div class="tool-desc"><a href="https://stripe.com/" target="_blank"><strong>Stripe</strong></a> — checkout, předplatné, fakturace</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name">📊 Monitoring</div>
+          <div class="tool-desc"><a href="https://sentry.io/" target="_blank"><strong>Sentry</strong></a> — chyby. <a href="https://posthog.com/" target="_blank"><strong>PostHog</strong></a> — analytika.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06 · FÁZE PROJEKTU ══════╗ -->
+    <div class="slide" data-slide="16" data-title="Fáze projektu" data-num="06">
+      <div class="slide-num">06</div>
+      <h2>Fáze projektu</h2>
+      <p class="lead">Pět kroků od nápadu po produkční nasazení. Každá fáze má svá pravidla.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 24px;">
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px 16px; text-align: center; position: relative;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 12px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px;">Fáze 1</span>
+          <h4 style="color: var(--blue); font-size: 1.05rem; margin-bottom: 6px;">Analýza</h4>
+          <p style="font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Definovat problém, připravit PRD</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px 16px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 12px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px;">Fáze 2</span>
+          <h4 style="color: var(--blue); font-size: 1.05rem; margin-bottom: 6px;">Design</h4>
+          <p style="font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Inspirace, AI nástroje, knihovny</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px 16px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 12px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px;">Fáze 3</span>
+          <h4 style="color: var(--blue); font-size: 1.05rem; margin-bottom: 6px;">Prototyp</h4>
+          <p style="font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; margin: 0;">První verze, zpětná vazba</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px 16px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 12px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px;">Fáze 4</span>
+          <h4 style="color: var(--blue); font-size: 1.05rem; margin-bottom: 6px;">Interní nástroj</h4>
+          <p style="font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Zelená zóna, denní použití</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px 16px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 12px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px;">Fáze 5</span>
+          <h4 style="color: var(--blue); font-size: 1.05rem; margin-bottom: 6px;">Produkce</h4>
+          <p style="font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Pro další lidi, pravidlo 90/10</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.1 · ANALÝZA A PŘÍPRAVA ══════╗ -->
+    <div class="slide" data-slide="17" data-title="Fáze 1: Analýza a příprava" data-sub="true">
+      <div class="slide-num">06.1</div>
+      <h2>Fáze 1: Analýza a&nbsp;příprava</h2>
+      <p class="lead">Pochopit problém a&nbsp;připravit kvalitní zadání (PRD) — dřív než se dotknete kódu. Vágní zadání&nbsp;= vágní výsledek.</p>
+
+      <div class="deliverable-grid">
+        <div class="deliverable-card">
+          <div class="del-icon">🎯</div>
+          <div class="del-name">Definovat problém, ne řešení</div>
+          <div class="del-desc">„Trávím 3 hodiny týdně tříděním faktur" je lepší vstup než „chci fakturační systém".</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">💬</div>
+          <div class="del-name">Pobavit se s&nbsp;AI</div>
+          <div class="del-desc">Nechte si navrhnout řešení, ptejte se na alternativy, iterujte na zadání.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">📎</div>
+          <div class="del-name">Nahrát kontext</div>
+          <div class="del-desc">Screenshoty, přepisy hovorů, dokumenty, existující řešení, data z&nbsp;webu.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">🔎</div>
+          <div class="del-name">Zjistit, co existuje</div>
+          <div class="del-desc">Možná nepotřebujete vibe codovat — stačí Typeform, Airtable nebo Notion databáze.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">📋</div>
+          <div class="del-name">Nechat AI vytvořit PRD</div>
+          <div class="del-desc">Strukturované zadání — co má aplikace umět, jak má vypadat, jaké technologie použít.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">🔄</div>
+          <div class="del-name">Iterovat na zadání</div>
+          <div class="del-desc">Opakovat, dokud není zadání jasné a&nbsp;konkrétní. Teprve pak zadat do vibe coding nástroje.</div>
+        </div>
+      </div>
+
+      <blockquote>
+        Filip pro podcast agenta nejdřív nahrál AI první tři díly podcastu, popis z&nbsp;YouTube, slovníček z&nbsp;Notionu. Pak teprve šel do Cursoru. Výsledek: úspora 88&nbsp;% času.
+      </blockquote>
+    </div>
+
+    <!-- ╔══════ 06.2 · DESIGN ══════╗ -->
+    <div class="slide" data-slide="18" data-title="Fáze 2: Design" data-sub="true">
+      <div class="slide-num">06.2</div>
+      <h2>Fáze 2: Design</h2>
+      <p class="lead">Navrhnout, jak to bude vypadat a&nbsp;fungovat — aniž byste museli být designér.</p>
+
+      <h3 style="margin-top: 20px; margin-bottom: 12px;">Inspirace</h3>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://mobbin.com" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">Mobbin ↗</a></div>
+          <div class="tool-desc">Knihovna UI vzorů z&nbsp;reálných mobilních a&nbsp;webových aplikací.</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://godly.website" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">Godly ↗</a></div>
+          <div class="tool-desc">Kuratovaná galerie nejlepších webových designů a&nbsp;interakcí.</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://madewithclaude.com" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">Made with Claude ↗</a></div>
+          <div class="tool-desc">Showcase aplikací a&nbsp;nástrojů vytvořených s&nbsp;Claude AI.</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://refero.design" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">Refero ↗</a></div>
+          <div class="tool-desc">Referenční knihovna reálných UI designů z&nbsp;tisíců webů a&nbsp;aplikací.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 24px; margin-bottom: 12px;">AI nástroje</h3>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://claude.ai/artifacts" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">Claude Design ↗</a></div>
+          <div class="tool-desc">AI generování UI komponent a&nbsp;interaktivních prototypů přímo v&nbsp;chatu.</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://www.figma.com/make/" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">Figma Make ↗</a></div>
+          <div class="tool-desc">AI generování designů přímo ve Figmě z&nbsp;textového popisu.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 24px; margin-bottom: 12px;">Knihovny</h3>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://ui.shadcn.com" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">shadcn/ui ↗</a></div>
+          <div class="tool-desc">Open-source knihovna komponent pro React — základ mnoha vibe coding nástrojů.</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-name"><a href="https://magicui.design" target="_blank" style="color: var(--blue); text-decoration: none; border-bottom: 1px solid var(--gray-300);">MagicUI ↗</a></div>
+          <div class="tool-desc">Animované UI komponenty a&nbsp;efekty pro moderní webové aplikace.</div>
+        </div>
+      </div>
+
+      <div class="verdict-box" style="margin-top: 20px;">
+        <p>🎨 Na design se dají aplikovat i&nbsp;konkrétní skills — např. <a href="https://impeccable.style/" target="_blank" style="color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--accent);">impeccable.style ↗</a></p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.3 · PROTOTYP ══════╗ -->
+    <div class="slide" data-slide="19" data-title="Fáze 3: Prototyp" data-sub="true">
+      <div class="slide-num">06.3</div>
+      <h2>Fáze 3: Prototyp</h2>
+      <p class="lead">Co nejrychleji vytvořit první verzi, na které lze sbírat zpětnou vazbu.</p>
+
+      <ol style="margin: 16px 0 16px 24px;">
+        <li>Vezměte PRD z&nbsp;fáze 1</li>
+        <li>Zadejte do vibe coding nástroje (Replit, Lovable, Claude Artifacts)</li>
+        <li>Nezačínejte vším najednou — jeden konkrétní problém, jedna hypotéza</li>
+        <li>Iterujte — přidávejte funkce postupně, testujte často a&nbsp;brzy</li>
+      </ol>
+
+      <div class="highlight-card">
+        <h4>Špatné vs. dobré zadání</h4>
+        <p>❌ „Vytvoř mi Facebook."<br>✅ „Udělej mi jednoduchou aplikaci, kde můžu psát posty a&nbsp;sdílet je s&nbsp;přáteli."</p>
+      </div>
+
+      <h3 style="margin-top: 20px;">Příklady prototypů z&nbsp;praxe účastníků</h3>
+      <div class="session-row">
+        <div class="session-num">01</div>
+        <div>
+          <div class="session-title">Evidence sortimentu a&nbsp;plánování výroby</div>
+          <div class="session-desc">Hrubý draft v&nbsp;Claude Code — ale jasný důkaz konceptu: „bez AI bych se na to nikdy nezmohl."</div>
+        </div>
+      </div>
+      <div class="session-row">
+        <div class="session-num">02</div>
+        <div>
+          <div class="session-title">Vytěžování faktur + zakázkové listy</div>
+          <div class="session-desc">Dva napůl funkční prototypy za jeden večer (od 20:00 do 3:15 ráno).</div>
+        </div>
+      </div>
+      <div class="session-row">
+        <div class="session-num">03</div>
+        <div>
+          <div class="session-title">Zpracování stížností — prototyp odprezentovaný vedení</div>
+          <div class="session-desc">Prototyp na mock datech, odprezentovaný naživo před manažery. Myšlenky nabyly úplně jinou hloubku.</div>
+        </div>
+      </div>
+      <div class="session-row">
+        <div class="session-num">04</div>
+        <div>
+          <div class="session-title">Optimalizace nákladů za dodávku energií</div>
+          <div class="session-desc">Funkční kalkulačka, která klientům ukáže, kdy se vyplatí přejít na vyšší sazbu.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.4 · INTERNÍ NÁSTROJ ══════╗ -->
+    <div class="slide" data-slide="20" data-title="Fáze 4: Interní nástroj" data-sub="true">
+      <div class="slide-num">06.4</div>
+      <h2>Fáze 4: Interní nástroj</h2>
+      <p class="lead">Jednoúčelový nástroj, který řeší váš konkrétní problém. Zelená zóna — žádné riziko, maximální užitek.</p>
+
+      <div class="verdict-box" style="background: linear-gradient(135deg, var(--green-soft), var(--teal-soft)); border-color: var(--green);">
+        <h3 style="color: var(--green);">Daily Use Test</h3>
+        <p>Z&nbsp;analýzy 200+ projektů: nejúspěšnější vibe codované nástroje řeší osobní friction points a&nbsp;používají se opakovaně. Start simple → Use personally → Share with team → Sometimes evolve into products.</p>
+      </div>
+
+      <h3 style="margin-top: 20px;">Příklady z&nbsp;praxe účastníků</h3>
+      <div class="deliverable-grid">
+        <div class="deliverable-card">
+          <div class="del-icon">📋</div>
+          <div class="del-name">Zpracování excelů</div>
+          <div class="del-desc">Týdenní ruční práce nahrazena jedním uploadem. Aplikace zpracuje vstup automaticky.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">🔧</div>
+          <div class="del-name">Automatizace pro kolegy</div>
+          <div class="del-desc">Knihovny na propojení s&nbsp;informačním systémem, automatické doplňování PDF. Úspora hodin týdně, nulová chybovost.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">🤖</div>
+          <div class="del-name">Discord bot na denní shrnutí</div>
+          <div class="del-desc">Ve 23:30 pročte diskuze dne, shrne témata a&nbsp;položí otázky. Kolegové si přečtou report místo scrollování.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">📰</div>
+          <div class="del-name">Legislativní novinky</div>
+          <div class="del-desc">Automatické stahování novinek o&nbsp;legislativě a&nbsp;sumarizace do interního newsletteru.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.5 · PRODUKCE ══════╗ -->
+    <div class="slide" data-slide="21" data-title="Fáze 5: Produkce" data-sub="true">
+      <div class="slide-num">06.5</div>
+      <h2>Fáze 5: Kódování</h2>
+      <p class="lead">Posunout projekt od prototypu k&nbsp;něčemu, co mohou používat další lidé. Tady začíná ta těžká část.</p>
+
+      <h3 style="margin-top: 16px;">Co řešit při přechodu</h3>
+      <div class="two-col">
+        <div>
+          <ul>
+            <li><strong>Bezpečnost</strong> — AI může generovat kód s&nbsp;dírami</li>
+            <li><strong>Škálovatelnost</strong> — funguje pro 5, ale co 500?</li>
+            <li><strong>Údržba</strong> — kdo to bude spravovat?</li>
+          </ul>
+        </div>
+        <div>
+          <ul>
+            <li><strong>Environment variables</strong> — API klíče nikdy nehardcodovat</li>
+            <li><strong>Monitoring</strong> — drift a&nbsp;neočekávané chování</li>
+            <li><strong>Shadow IT</strong> — komunikace, ne zákaz</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 20px;">Příklady z&nbsp;praxe účastníků</h3>
+      <div class="session-row">
+        <div class="session-num">01</div>
+        <div>
+          <div class="session-title">Vzdálená správa 160 počítačů</div>
+          <div class="session-desc">Za 3 dny aplikace na míru, která nahradila drahý komerční SW. „Rozumím jí, nebojím se jí, dělá co chci."</div>
+        </div>
+      </div>
+      <div class="session-row">
+        <div class="session-num">02</div>
+        <div>
+          <div class="session-title">Fakturační systém</div>
+          <div class="session-desc">Od vystavení po automatickou kontrolu platby. „To, co mají SAP a&nbsp;Helios za velké peníze, mám za hodinu."</div>
+        </div>
+      </div>
+      <div class="session-row">
+        <div class="session-num">03</div>
+        <div>
+          <div class="session-title">Informační web pro klienty</div>
+          <div class="session-desc">Nahradil emailovou sérii. Přehledná stránka, kde si klienti rozkliknou co potřebují, snadno editovatelná.</div>
+        </div>
+      </div>
+      <div class="session-row">
+        <div class="session-num">04</div>
+        <div>
+          <div class="session-title">Ekosystém sportovních aplikací</div>
+          <div class="session-desc">Scraper výsledků, plánovač turnajů a&nbsp;statistická appka propojené dohromady. Cíl: škálovatelný produkt pro kluby.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 24px;">Jak šetřit tokeny a&nbsp;pracovat efektivně</h3>
+      <div class="group-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+        <div class="group-card">
+          <div class="group-icon">📝</div>
+          <div class="group-name">Před zadáním</div>
+          <div class="group-desc">
+            <ul style="margin: 0; padding-left: 16px; font-size: 0.9rem;">
+              <li>Soubory převeďte na .md (PDF = 1 500–3 000 tokenů)</li>
+              <li>Vyberte správný model — levný na drafty, silný na logiku</li>
+              <li>Plánujte v&nbsp;chatu (levně), stavte v&nbsp;Coworku</li>
+            </ul>
+          </div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">💬</div>
+          <div class="group-name">Během chatu</div>
+          <div class="group-desc">
+            <ul style="margin: 0; padding-left: 16px; font-size: 0.9rem;">
+              <li>Více úkolů = 1 zpráva (3 prompty = 3× reload kontextu)</li>
+              <li>Editujte zprávu místo nové odpovědi</li>
+              <li>Opravujte jen konkrétní sekce, ne celý výstup</li>
+            </ul>
+          </div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🔄</div>
+          <div class="group-name">Po chatu</div>
+          <div class="group-desc">
+            <ul style="margin: 0; padding-left: 16px; font-size: 0.9rem;">
+              <li>Po 15–20 zprávách shrňte a&nbsp;začněte nový chat (~105K tokenů)</li>
+              <li>Nové téma = nový chat (starý kontext je mrtvá váha)</li>
+              <li>Opakované soubory dejte do Projektu — jednou nahrajete, navždy k&nbsp;dispozici</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top: 10px; font-size: 0.82rem; color: var(--gray-500);">Zdroj: Ruben Hassid, how-to-ai.guide</p>
+    </div>
+
+    <!-- ╔══════ 07 · ÚROVNĚ NASAZENÍ ══════╗ -->
+    <div class="slide" data-slide="22" data-title="Úrovně nasazení" data-num="07">
+      <div class="slide-num">07</div>
+      <h2>Úrovně nasazení</h2>
+      <p class="lead">Od souboru na vlastním počítači po firemní infrastrukturu — čtyři úrovně, kam váš projekt může žít.</p>
+
+      <div class="group-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="group-card zone-green" style="background: var(--green-soft);">
+          <div class="group-icon">🌐</div>
+          <div class="group-name">Na platformě</div>
+          <div class="group-subtitle">Lovable, Replit, Bolt</div>
+          <div class="group-desc">Nejjednodušší cesta. Aplikace běží na serverech poskytovatele. Vy ji jen sdílíte odkazem. Hosting 0–25 USD/měsíc.</div>
+        </div>
+        <div class="group-card" style="background: var(--blue-soft);">
+          <div class="group-icon">💻</div>
+          <div class="group-name">Pro sebe</div>
+          <div class="group-subtitle">HTML soubor, lokální aplikace</div>
+          <div class="group-desc">Webová stránka jako HTML soubor nebo jednoduchá aplikace na vašem počítači. Žádný server, žádné náklady. Ideální pro skripty a jednoúčelové nástroje.</div>
+        </div>
+        <div class="group-card" style="background: var(--orange-soft);">
+          <div class="group-icon">🖥️</div>
+          <div class="group-name">Veřejně na serveru</div>
+          <div class="group-subtitle">Vercel, Netlify, GitHub Pages</div>
+          <div class="group-desc">Aplikace běží online, přístupná přes URL. Bez přihlašování, bez správy uživatelů. Sdílíte odkaz kolegům nebo klientům.</div>
+        </div>
+        <div class="group-card" style="background: var(--purple-soft);">
+          <div class="group-icon">🔐</div>
+          <div class="group-name">S&nbsp;přihlášením</div>
+          <div class="group-subtitle">Supabase, Clerk, Replit Auth</div>
+          <div class="group-desc">Uživatelské účty, role, oprávnění, databáze. Pro tým nebo platící zákazníky. Replit/Lovable to řeší automaticky.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 32px;">Enterprise nasazení</h3>
+      <p class="lead" style="margin-bottom: 16px;">Jak dostat vibe codované aplikace do firemního prostředí — bezpečně a&nbsp;bez zbytečné komplexity.</p>
+
+      <div class="highlight-card">
+        <h4>Deploy na firemní infrastrukturu</h4>
+        <p>Cíl: umožnit zaměstnancům stavět jednoduché interní nástroje, aniž by museli řešit GitHub, Vercel nebo jiné technické platformy. Aplikace běží ve firemním prostředí, pod firemní kontrolou.</p>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--blue);">Co by mělo prostředí umět</div>
+          <ul>
+            <li>Jednoduché nasazení aplikace — ideálně jedno tlačítko</li>
+            <li>Napojení na firemní přihlašování (SSO)</li>
+            <li>Izolace dat — nic neuteče mimo firmu</li>
+            <li>Audit log — kdo co vytvořil a&nbsp;kdy</li>
+            <li>Guardrails — limity na API volání, povolené služby</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--purple);">Jak nastavit pravidla</div>
+          <ul>
+            <li>Definovat zelená/žlutá/červená zóna pro firemní kontext</li>
+            <li>Povinná revize kódu pro žlutou+ zónu</li>
+            <li>Sandbox prostředí pro experimentování</li>
+            <li>Governance: kdo schvaluje nasazení do produkce</li>
+            <li>Komunikace s&nbsp;IT — ne zákaz, ale spolupráce</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="margin-top: 16px;">
+        <span class="tool-badge">Superblocks</span>
+        <span class="tool-badge">Retool Enterprise</span>
+        <span class="tool-badge">Cloudflare VibeSDK</span>
+        <span class="tool-badge">Salesforce Agentforce Vibes</span>
+      </p>
+    </div>
+
+    <!-- ╔══════ 07.1 · DOPORUČENÍ ══════╗ -->
+    <div class="slide" data-slide="23" data-title="Doporučení" data-sub="true">
+      <div class="slide-num">07.1</div>
+      <h2>Doporučení pro efektivní práci</h2>
+      <p class="lead">Co odlišuje úspěšné vibe kodéry od frustrovaných začátečníků — systém, skills a&nbsp;správný mindset.</p>
+
+      <div class="skill-chain">
+        <div class="skill-step">
+          <div class="step-icon">💪</div>
+          <div class="step-name">Odvaha</div>
+        </div>
+        <div class="skill-arrow">→</div>
+        <div class="skill-step">
+          <div class="step-icon">🔍</div>
+          <div class="step-name">Zvědavost</div>
+        </div>
+        <div class="skill-arrow">→</div>
+        <div class="skill-step">
+          <div class="step-icon">⏳</div>
+          <div class="step-name">Trpělivost</div>
+        </div>
+        <div class="skill-arrow">→</div>
+        <div class="skill-step">
+          <div class="step-icon">🔄</div>
+          <div class="step-name">Zpětná vazba</div>
+        </div>
+        <div class="skill-arrow">→</div>
+        <div class="skill-step" style="border-color: var(--accent);">
+          <div class="step-icon">⭐</div>
+          <div class="step-name">Zkušenost</div>
+        </div>
+      </div>
+
+      <div class="group-grid" style="margin-top: 24px; grid-template-columns: 1fr 1fr;">
+        <div class="group-card">
+          <div class="group-icon">🔧</div>
+          <div class="group-name">Compound engineering</div>
+          <div class="group-subtitle">Efekt sněhové koule</div>
+          <div class="group-desc">Osobní sbírka nástrojů, skriptů a&nbsp;API napojení. Princip: udělat to jednou správně a&nbsp;opakovaně využívat. Každý projekt posiluje další.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">📖</div>
+          <div class="group-name">Context engineering</div>
+          <div class="group-subtitle">Důležitější než prompting</div>
+          <div class="group-desc">Kvalita dat a&nbsp;kontextu, které AI dáte k&nbsp;dispozici, je důležitější než prompt. 10 dobrých příkladů > dokonalý prompt.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🤖</div>
+          <div class="group-name">Využití AI v&nbsp;jakékoliv fázi</div>
+          <div class="group-subtitle">Od hovoru po aktualizaci aplikace</div>
+          <div class="group-desc">Přepisy hovorů, poznámky z&nbsp;meetingů, konverzace s&nbsp;kolegy — vše se stává vstupem pro AI. Z&nbsp;přepisu hovoru vytáhněte klíčové body a&nbsp;nechte AI aktualizovat aplikaci.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🧠</div>
+          <div class="group-name">Skills</div>
+          <div class="group-subtitle">Naučit, stáhnout nebo koupit</div>
+          <div class="group-desc">Skills se dají naučit, stáhnout nebo koupit. Na programování a&nbsp;vibe coding jich existuje obrovské množství — od hotových šablon po kompletní workflows.</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 24px;">Tipy na knihovny a&nbsp;dovednosti</h3>
+      <a href="https://github.com/kojott/claude-replan" target="_blank" class="resource-link">
+        <span class="rl-icon">📦</span>
+        <div>
+          claude-replan
+          <div class="rl-desc">Plánování a re-plánování projektů s&nbsp;Claude — strukturovaný workflow pro složitější projekty</div>
+        </div>
+      </a>
+      <a href="https://github.com/affaan-m/everything-claude-code" target="_blank" class="resource-link">
+        <span class="rl-icon">📦</span>
+        <div>
+          everything-claude-code
+          <div class="rl-desc">Kompletní sbírka pravidel, skills a&nbsp;konfigurací pro Claude Code</div>
+        </div>
+      </a>
+      <a href="https://lawsofsoftwareengineering.com" target="_blank" class="resource-link">
+        <span class="rl-icon">📖</span>
+        <div>
+          Laws of Software Engineering
+          <div class="rl-desc">Základní principy softwarového inženýrství</div>
+        </div>
+      </a>
+      <a href="https://impeccable.style/" target="_blank" class="resource-link">
+        <span class="rl-icon">🎨</span>
+        <div>
+          impeccable.style
+          <div class="rl-desc">Konkrétní design skills pro profesionální výsledky</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- ╔══════ 08 · PŘÍBĚHY Z PRAXE ══════╗ -->
+    <div class="slide" data-slide="23" data-title="Příběhy z praxe" data-num="08">
+      <div class="slide-num">08</div>
+      <h2>Příběhy z&nbsp;praxe</h2>
+      <p class="lead">Reálné projekty — od jednoho rána po stovky hodin.</p>
+
+      <div class="two-col" style="margin-top: 20px;">
+        <div>
+          <div class="highlight-card" style="margin-top: 0;">
+            <h4>🏭 Evidence výroby za jeden večer</h4>
+            <p>Aplikace na evidenci sortimentu, zakázek a&nbsp;plánování výroby v&nbsp;Claude Code. Hrubý draft — ale důkaz, že to jde: „bez AI bych se na to nikdy nezmohl."</p>
+          </div>
+          <div class="highlight-card">
+            <h4>🤖 Discord bot „Jeskynní muž"</h4>
+            <p>Propojení Discordu s&nbsp;make.com — bot každý den ve 23:30 shrne diskuze, navrhne otázky. Kolegové si přečtou report místo scrollování stovek zpráv.</p>
+          </div>
+          <div class="highlight-card">
+            <h4>📱 Domácí lékárnička</h4>
+            <p>Rodinná aplikace na expirace léků — 11 verzí, propojení s&nbsp;Firebase, sdílená data přes dva telefony. Od nápadu po denní používání.</p>
+          </div>
+          <div class="highlight-card">
+            <h4>⚡ Automatizace pro kolegy</h4>
+            <p>Knihovny na propojení s&nbsp;informačním systémem, automatické doplňování PDF. Úspora hodin týdně a&nbsp;nulová chybovost v&nbsp;činnostech, které si předtím každý dělal jinak.</p>
+          </div>
+        </div>
+        <div>
+          <div class="highlight-card" style="margin-top: 0;">
+            <h4>💻 Správa 160 počítačů</h4>
+            <p>Za 3 dny aplikace na vzdálenou správu, která nahradila drahý komerční SW. „Rozumím jí, nebojím se jí, dělá přesně to, co chci."</p>
+          </div>
+          <div class="highlight-card">
+            <h4>🧾 Fakturace za hodinu</h4>
+            <p>Kompletní systém od vystavení po automatickou kontrolu platby. „To, co mají SAP a&nbsp;Helios za velké peníze, mám hotové za hodinu."</p>
+          </div>
+          <div class="highlight-card">
+            <h4>📋 Zpracování stížností</h4>
+            <p>Prototyp na mock datech — odprezentovaný naživo před vedením. „Myšlenky najednou nabyly úplně jinou hloubku s&nbsp;mnohem větším impactem."</p>
+          </div>
+          <div class="highlight-card">
+            <h4>👧 Aplikace na procvičování pravopisu</h4>
+            <p>„Stačí trocha technologie a&nbsp;obrázků a&nbsp;dítě křičí: Já se chci učit!" Navibecódovaná appka — velký úspěch.</p>
+          </div>
+        </div>
+      </div>
+
+      <blockquote style="margin-top: 16px;">
+        „Začal jsem v&nbsp;osm večer, chtěl jsem si to jenom na chvilku vyzkoušet. Když to konečně začalo fungovat a&nbsp;vypadat k&nbsp;světu, s&nbsp;hrůzou jsem zjistil, že je 3:15 ráno."
+      </blockquote>
+    </div>
+
+    <!-- ╔══════ 09 · BUDOUCNOST A PŘÍLEŽITOSTI ══════╗ -->
+    <div class="slide" data-slide="24" data-title="Budoucnost a příležitosti" data-num="09">
+      <div class="slide-num">09</div>
+      <h2>Budoucnost a&nbsp;příležitosti</h2>
+      <p class="lead">Kde je největší prostor pro vás — a&nbsp;kam se vibe coding posouvá.</p>
+
+      <h3 style="margin-top: 20px;">Top příležitosti ve vibe codingu</h3>
+      <div style="margin-top: 12px;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div>
+            <div class="session-title">Profesionál s top AI skills</div>
+            <div class="session-desc">Vývoj aplikací pro sebe a tým — interní nástroje, automatizace, dashboardy</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div>
+            <div class="session-title">AI adopce ve firmě</div>
+            <div class="session-desc">Pomoc ostatním oddělením, „firmy vám budou trhat ruce"</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div>
+            <div class="session-title">Freelancer — AI adopce pro klienty</div>
+            <div class="session-desc">Rostoucí poptávka po lidech, kteří umí pomáhat s adopcí</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div>
+            <div class="session-title">Doplnění služby o digitální nástroje</div>
+            <div class="session-desc">Freelancer/firma přidá vibe codovaný produkt ke stávající nabídce</div>
+          </div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">05</div>
+          <div>
+            <div class="session-title">Nový AI produkt</div>
+            <div class="session-desc">Pozor: je to i o marketingu, komunikaci a zákaznické podpoře</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 28px;">Kam se vibe coding posouvá</h3>
+      <div class="deliverable-grid" style="margin-top: 12px;">
+        <div class="deliverable-card">
+          <div class="del-icon">🗄️</div>
+          <div class="del-name">Integrované databáze a AI</div>
+          <div class="del-desc">Přímo v jedné aplikaci — žádné napojování externích systémů.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">🔐</div>
+          <div class="del-name">Autentifikace jako standard</div>
+          <div class="del-desc">Přihlašování, správa uživatelů, role — vše integrované.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">🎨</div>
+          <div class="del-name">Hezčí grafika z AI</div>
+          <div class="del-desc">S&nbsp;každou generací modelů roste i&nbsp;kvalita designu. Profesionální výsledky vznikají za minuty, ne hodiny.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-icon">💳</div>
+          <div class="del-name">Platby bez složité implementace</div>
+          <div class="del-desc">Napojení na Stripe a další platební systémy je stále jednodušší.</div>
+        </div>
+      </div>
+
+      <div class="cta-box" style="margin-top: 28px;">
+        <h3>Jediná konkurenční výhoda do budoucna bude rychlost.</h3>
+        <p style="margin-top: 12px; font-size: 1.1rem;">Ne do úterka, ale ještě dneska, do oběda.</p>
+        <p style="margin-top: 16px; opacity: 0.7;">Filip Dřímalka</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="nav-btn-slide" id="btnToggleSidebar" onclick="toggleSidebar()" title="Schovat/zobrazit menu" style="padding: 8px 12px;">☰</button>
+      <span class="slide-counter" id="slideCounter">1 / 25</span>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn-slide" id="btnPrev" onclick="goSlide(-1)">← Předchozí</button>
+      <button class="nav-btn-slide" id="btnNext" onclick="goSlide(1)">Další →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const wrapper = document.getElementById('slidesWrapper');
+const counter = document.getElementById('slideCounter');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const sidebarNav = document.getElementById('sidebarNav');
+const webNavInner = document.getElementById('webNavInner');
+
+slides.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-item' + (s.dataset.sub === 'true' ? ' sub' : '') + (i === 0 ? ' active' : '');
+  const num = s.dataset.num || '';
+  btn.innerHTML = (num ? '<span class="nav-num">' + num + '</span>' : '') + '<span>' + s.dataset.title + '</span>';
+  btn.onclick = () => { s.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  btn.dataset.idx = i;
+  sidebarNav.appendChild(btn);
+
+  if (s.dataset.num && !s.dataset.sub) {
+    const nextSlide = slides[i + 1];
+    if (nextSlide && nextSlide.dataset.sub === 'true') {
+    } else if (i < slides.length - 1) {
+      const sep = document.createElement('div');
+      sep.className = 'nav-sep';
+      sidebarNav.appendChild(sep);
+    }
+  }
+
+  if (s.dataset.num && !s.dataset.sub) {
+    const wb = document.createElement('button');
+    wb.className = 'web-nav-btn' + (i === 0 ? ' active' : '');
+    wb.textContent = s.dataset.title;
+    wb.dataset.idx = i;
+    wb.onclick = () => { s.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    webNavInner.appendChild(wb);
+  }
+});
+
+let currentSlide = 0;
+
+function updateUI() {
+  counter.textContent = (currentSlide + 1) + ' / ' + slides.length;
+  btnPrev.disabled = currentSlide === 0;
+  btnNext.disabled = currentSlide === slides.length - 1;
+  sidebarNav.querySelectorAll('.nav-item').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.idx) === currentSlide);
+  });
+}
+
+function goSlide(dir) {
+  const next = currentSlide + dir;
+  if (next >= 0 && next < slides.length) {
+    slides[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio > 0.3) {
+      currentSlide = Array.from(slides).indexOf(e.target);
+      updateUI();
+    }
+  });
+}, { root: wrapper, threshold: [0.3, 0.6] });
+slides.forEach(s => obs.observe(s));
+
+const webObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const slide = e.target;
+      const num = slide.dataset.num;
+      if (num) {
+        webNavInner.querySelectorAll('.web-nav-btn').forEach(b => b.classList.remove('active'));
+        const idx = Array.from(slides).indexOf(slide);
+        const match = webNavInner.querySelector('.web-nav-btn[data-idx="' + idx + '"]');
+        if (match) match.classList.add('active');
+      }
+    }
+  });
+}, { rootMargin: '-100px 0px -60% 0px' });
+slides.forEach(s => webObs.observe(s));
+
+let mode = 'web';
+
+function setMode(m) {
+  mode = m;
+  const fabWeb = document.getElementById('fabWeb');
+  const fabSlides = document.getElementById('fabSlides');
+  if (m === 'slides') {
+    document.body.classList.add('slides-mode');
+    document.body.classList.remove('fullscreen');
+    fabWeb.classList.remove('active');
+    fabSlides.classList.add('active');
+    wrapper.scrollTop = 0;
+  } else {
+    document.body.classList.remove('slides-mode', 'sidebar-collapsed', 'fullscreen');
+    fabWeb.classList.add('active');
+    fabSlides.classList.remove('active');
+    window.scrollTo(0, 0);
+  }
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-collapsed');
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    if (mode === 'web') setMode('slides');
+    document.documentElement.requestFullscreen();
+    document.body.classList.add('fullscreen');
+  } else {
+    document.exitFullscreen();
+    document.body.classList.remove('fullscreen');
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    document.body.classList.remove('fullscreen');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (mode === 'slides') {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goSlide(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goSlide(-1); }
+    if (e.key === 'Escape' && !document.fullscreenElement) { toggleSidebar(); }
+  }
+  if (e.key === 'f' || e.key === 'F') {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    toggleFullscreen();
+  }
+});
+
+updateUI();
+</script>
+
+</body>
+</html>

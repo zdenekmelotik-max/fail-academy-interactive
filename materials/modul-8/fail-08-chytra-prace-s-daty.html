@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jak na chytrou práci s daty s AI — FAIL JARO 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --paper: #faf9f7;
+      --accent: #e94560;
+      --accent-soft: #fce4ec;
+      --blue: #0f3460;
+      --blue-soft: #e3f2fd;
+      --blue-mid: #1a5276;
+      --green: #16813d;
+      --green-soft: #e8f5e9;
+      --orange: #e77f1b;
+      --orange-soft: #fff3e0;
+      --purple: #6c3fa0;
+      --purple-soft: #f3e5f5;
+      --teal: #0e8a7d;
+      --teal-soft: #e0f2f1;
+      --gray-100: #f5f5f5;
+      --gray-200: #eeeeee;
+      --gray-300: #e0e0e0;
+      --gray-500: #9e9e9e;
+      --gray-700: #616161;
+      --radius: 12px;
+      --sidebar-w: 280px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--blue);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      overflow-y: auto;
+      transition: transform 0.3s;
+      transform: translateX(-100%);
+    }
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-header .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    .sidebar-header .client {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.5;
+      margin-top: 4px;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      color: rgba(255,255,255,0.55);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-align: left;
+      width: 100%;
+      line-height: 1.4;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: rgba(255,255,255,0.12); color: white; font-weight: 600; }
+    .nav-item .nav-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      min-width: 22px;
+      opacity: 0.5;
+      padding-top: 1px;
+    }
+    .nav-item.active .nav-num { color: var(--accent); opacity: 1; }
+    .nav-item.sub { padding-left: 52px; font-size: 0.78rem; }
+    .nav-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 8px 20px; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.72rem;
+      opacity: 0.4;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ═══ MODES ═══ */
+    body.slides-mode { overflow: hidden; height: 100vh; }
+    body.slides-mode .sidebar { transform: translateX(0); }
+    body.slides-mode .main { margin-left: var(--sidebar-w); height: 100vh; }
+    body.slides-mode .slides-wrapper {
+      overflow-y: auto;
+      scroll-snap-type: y proximity;
+      max-width: none;
+      padding: 0;
+      width: 100%;
+      margin: 0;
+    }
+    body.slides-mode .slide {
+      min-height: 100vh;
+      padding: 60px 80px;
+      scroll-snap-align: start;
+      justify-content: center;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    body.slides-mode .slide.slide-hero {
+      margin: 0;
+      padding: 60px 80px;
+      max-width: none;
+      width: 100%;
+    }
+    body.slides-mode .bottom-bar { display: flex; }
+    body.slides-mode .web-nav { display: none !important; }
+
+    body.slides-mode.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+    body.slides-mode.sidebar-collapsed .main { margin-left: 0; }
+
+    body.fullscreen .sidebar { transform: translateX(-100%) !important; }
+    body.fullscreen .main { margin-left: 0 !important; }
+    body.fullscreen .bottom-bar { opacity: 0; transition: opacity 0.2s; }
+    body.fullscreen .bottom-bar:hover { opacity: 1; }
+    body.fullscreen .slide { padding: 60px 120px; max-width: none; }
+    body.fullscreen .slide h2 { font-size: 3rem; }
+    body.fullscreen .slide .lead { font-size: 1.35rem; }
+
+    .web-nav {
+      display: flex;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      border-bottom: 1px solid var(--gray-300);
+      padding: 0 40px;
+      align-items: stretch;
+    }
+    .web-nav-inner {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex: 1;
+      min-width: 0;
+    }
+    .web-nav-btn {
+      padding: 14px 16px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .web-nav-btn:hover { color: var(--blue); background: var(--gray-100); }
+    .web-nav-btn.active { color: var(--blue); border-bottom-color: var(--accent); }
+
+    /* ═══ FLOATING MODE BUTTON ═══ */
+    .mode-fab {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 150;
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 5px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      opacity: 0.55;
+      transition: opacity 0.25s;
+    }
+    .mode-fab:hover { opacity: 1; }
+    .mode-fab button {
+      padding: 7px 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: none;
+      color: var(--gray-500);
+    }
+    .mode-fab button:hover { color: var(--blue); background: var(--gray-100); }
+    .mode-fab button.active { background: var(--blue); color: white; }
+    .mode-fab .fab-sep { width: 1px; background: var(--gray-200); margin: 2px 2px; }
+
+    /* ═══ MAIN ═══ */
+    .main {
+      margin-left: 0;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s;
+    }
+    .slides-wrapper {
+      flex: 1;
+      scroll-behavior: smooth;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+    .slide {
+      min-height: auto;
+      padding: 56px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .slide.slide-hero {
+      background: var(--blue);
+      color: white;
+      max-width: none;
+      margin: 0 -40px;
+      padding: 80px 40px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide.slide-hero::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ═══ BOTTOM BAR ═══ */
+    .bottom-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      background: white;
+      border-top: 1px solid var(--gray-200);
+      flex-shrink: 0;
+    }
+    .slide-counter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+    .nav-buttons { display: flex; gap: 8px; }
+    .nav-btn-slide {
+      padding: 8px 20px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      background: white;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn-slide:hover { background: var(--blue); color: white; border-color: var(--blue); }
+    .nav-btn-slide:disabled { opacity: 0.3; pointer-events: none; }
+
+    /* ═══ TYPOGRAPHY ═══ */
+    .slide-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .slide h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 3rem;
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .slide h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.4rem;
+      font-weight: 400;
+      color: var(--blue);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .slide h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .slide .lead {
+      font-size: 1.2rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      max-width: 720px;
+    }
+    .slide-hero .lead {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.15rem;
+      max-width: 700px;
+    }
+    .slide p { margin: 10px 0; font-size: 1.05rem; line-height: 1.7; }
+    .slide ul, .slide ol { margin: 12px 0 12px 24px; }
+    .slide li { margin: 8px 0; font-size: 1.05rem; line-height: 1.6; }
+
+    /* ═══ HERO ═══ */
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .stat-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.2rem;
+      display: block;
+    }
+    .hero-stat .stat-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.6;
+    }
+    .version {
+      display: inline-block;
+      align-self: flex-start;
+      width: fit-content;
+      background: var(--accent);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      position: relative; z-index: 1;
+      margin-bottom: 16px;
+    }
+
+    /* ═══ COMPONENTS ═══ */
+    .group-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin: 28px 0;
+    }
+    .group-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      transition: box-shadow 0.2s;
+    }
+    .group-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .group-card .group-icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .group-card .group-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .group-card .group-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+    .group-card .group-desc { font-size: 1rem; color: var(--gray-700); line-height: 1.6; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin: 24px 0;
+    }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .two-col ul { margin: 8px 0 0 20px; }
+    .two-col li { font-size: 1.05rem; margin: 8px 0; line-height: 1.6; }
+
+    blockquote {
+      background: var(--gray-100);
+      padding: 24px 28px;
+      margin: 14px 0;
+      border-radius: var(--radius);
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    blockquote .quote-author {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--gray-500);
+      margin-top: 10px;
+      display: block;
+      font-style: normal;
+    }
+
+    .flow-phase {
+      background: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 16px 0;
+      border: 1px solid var(--gray-200);
+      position: relative;
+    }
+    .flow-phase .phase-num {
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--blue);
+      color: white;
+      padding: 2px 14px;
+      border-radius: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .flow-phase h4 { margin-top: 8px; margin-bottom: 6px; color: var(--blue); font-size: 1.1rem; }
+    .flow-phase p { font-size: 1rem; color: var(--gray-700); }
+    .flow-phase .phase-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    .highlight-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 16px 0;
+      transition: box-shadow 0.2s;
+    }
+    .highlight-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .highlight-card h4 { font-size: 1.1rem; font-weight: 600; margin: 0 0 8px; color: var(--blue); }
+    .highlight-card p { font-size: 1rem; color: var(--gray-700); margin: 6px 0; }
+
+    .verdict-box {
+      background: linear-gradient(135deg, var(--accent-soft), #fff3e0);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 24px 0;
+    }
+    .verdict-box p { font-size: 1.1rem; font-weight: 500; }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 20px 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+    th {
+      background: var(--blue);
+      color: white;
+      padding: 14px 18px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 1rem;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--gray-100); }
+
+    .comparison-table th:first-child { background: var(--ink); }
+    .comparison-table td:first-child { font-weight: 600; font-size: 0.95rem; color: var(--ink); background: var(--gray-100); width: 120px; white-space: nowrap; }
+    .comparison-table .col-old { background: var(--gray-100); color: var(--gray-700); }
+    .comparison-table .col-new { background: var(--blue-soft); color: var(--blue); font-weight: 500; }
+
+    .deliverable-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .deliverable-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .deliverable-card .del-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .deliverable-card .del-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .deliverable-card .del-name { font-weight: 600; font-size: 1.05rem; color: var(--ink); }
+    .deliverable-card .del-desc { font-size: 0.95rem; color: var(--gray-700); line-height: 1.6; }
+
+    .pricing-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 16px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .pricing-card.featured { border-color: var(--accent); }
+    .pricing-card .pricing-name { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--ink); margin-bottom: 4px; }
+    .pricing-card .pricing-price { font-family: 'IBM Plex Mono', monospace; font-size: 1.3rem; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+    .pricing-card .pricing-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--gray-500); }
+    .pricing-card ul { margin: 0 0 0 20px; }
+    .pricing-card li { font-size: 1rem; color: var(--gray-700); margin: 8px 0; }
+
+    .client-logos { display: grid; grid-template-columns: repeat(5, auto); justify-content: start; gap: 12px; margin: 16px 0; }
+    .client-badge { background: white; border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 18px; font-size: 0.95rem; font-weight: 500; color: var(--gray-700); text-align: center; }
+
+    .cta-box {
+      background: var(--blue);
+      color: white;
+      border-radius: var(--radius);
+      padding: 48px;
+      text-align: center;
+      margin: 32px 0;
+    }
+    .cta-box h3 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 400; color: white; margin: 0 0 8px; }
+    .cta-box p { color: rgba(255,255,255,0.85); margin: 4px 0; font-size: 1.05rem; }
+    .cta-box a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    .cta-box a:hover { text-decoration: underline; }
+
+    details { margin: 16px 0; border-radius: var(--radius); overflow: hidden; }
+    details summary {
+      cursor: pointer;
+      padding: 16px 22px;
+      background: var(--gray-100);
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--blue);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    details summary:hover { background: var(--gray-200); }
+    details summary::before { content: '▸'; font-size: 0.9rem; transition: transform 0.2s; display: inline-block; }
+    details[open] summary::before { transform: rotate(90deg); }
+    details[open] summary { border-radius: var(--radius) var(--radius) 0 0; background: var(--blue-soft); }
+    .details-content { padding: 20px; background: white; border: 1px solid var(--gray-200); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+
+    .session-row {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 18px;
+      padding: 16px 18px;
+    }
+    .session-row:nth-child(odd) { background: var(--gray-100); }
+    .session-row:first-child { border-radius: 8px 8px 0 0; }
+    .session-row:last-child { border-radius: 0 0 8px 8px; }
+    .session-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .session-title { font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+    .session-desc { font-size: 0.95rem; color: var(--gray-700); margin-top: 2px; }
+
+    /* ═══ MOBILE ═══ */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .slide { padding: 40px 28px; }
+      .group-grid { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .deliverable-grid { grid-template-columns: 1fr; }
+      .pricing-card { grid-template-columns: 1fr; }
+      .slide h1 { font-size: 2.2rem; }
+      .slide h2 { font-size: 1.8rem; }
+      .mobile-toggle {
+        display: block !important;
+        position: fixed;
+        top: 12px; left: 12px;
+        z-index: 300;
+        background: var(--blue);
+        color: white;
+        border: none;
+        width: 40px; height: 40px;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="mobile-toggle" style="display:none;" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- ═══ SIDEBAR (visible in slides mode) ═══ -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand">Future AI Leader</div>
+    <div class="client">FAIL JARO 2026 · 2026</div>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <div class="sidebar-footer">FAIL26-01 · Modul 8 · Data &amp; AI</div>
+</div>
+
+<!-- ═══ FLOATING MODE SWITCHER (visible in both modes) ═══ -->
+<div class="mode-fab" id="modeFab">
+  <button id="fabWeb" onclick="setMode('web')">Web</button>
+  <button id="fabSlides" class="active" onclick="setMode('slides')">Prezentace</button>
+  <div class="fab-sep"></div>
+  <button id="fabFS" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+</div>
+
+<!-- ═══ WEB NAV (visible only in web mode) ═══ -->
+<div class="web-nav" id="webNav">
+  <div class="web-nav-inner" id="webNavInner"></div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div class="slides-wrapper" id="slidesWrapper">
+
+    <!-- ╔══════ HERO SLIDE ══════╗ -->
+    <div class="slide slide-hero" data-slide="0" data-title="Úvod">
+      <span class="version">FAIL — Modul 8</span>
+      <h1>Jak na chytrou práci<br>s&nbsp;daty s&nbsp;AI</h1>
+      <p class="lead">AI vám umožní analyzovat data bez čekání na analytiky. Pokud víte, jaká data máte, jak je připravit a&nbsp;jaký nástroj použít, dokážete z&nbsp;nich rychle vytáhnout podklady pro rozhodnutí, reporting, projekty i&nbsp;AI agenty.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-val">5</span>
+          <span class="stat-label">Fází práce s&nbsp;daty</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-val">3</span>
+          <span class="stat-label">Typy nástrojů</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-val">10</span>
+          <span class="stat-label">Typových scénářů</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-val">80&nbsp;%</span>
+          <span class="stat-label">Nestrukturovaných dat</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 01 · STRATEGICKÝ POHLED ══════╗ -->
+    <div class="slide" data-slide="1" data-title="Strategický pohled" data-num="01">
+      <div class="slide-num">01</div>
+      <h2>Strategický pohled</h2>
+      <p class="lead">AI vám umožní analyzovat data způsobem, na který jste dřív čekali na analytiky. Užitečné informace vytáhnete v&nbsp;reálném čase — a&nbsp;díky tomu děláte lepší rozhodnutí, stavíte lepší projekty a&nbsp;máte silnější podklady pro vše ostatní.</p>
+      <div class="two-col" style="margin-top: 28px;">
+        <div>
+          <div class="col-label" style="color: var(--gray-500);">Starý svět</div>
+          <ul>
+            <li>Data jsou někde v&nbsp;Excelu, CRM, e-mailech a&nbsp;složkách.</li>
+            <li>Analýza znamená čekání na analytika nebo ruční práci.</li>
+            <li>Reporting často popisuje minulost se zpožděním.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">Nový svět s&nbsp;AI</div>
+          <ul>
+            <li>Ptáte se dat přirozeným jazykem a&nbsp;rychle testujete hypotézy.</li>
+            <li>Čistíte, spojujete a&nbsp;obohacujete datasety i&nbsp;bez datového oddělení.</li>
+            <li>Data se stávají kontextem pro agenty, ne jen podkladem pro graf.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p><strong>Hlavní posun:</strong> nejde o&nbsp;to mít víc dat. Jde o&nbsp;to umět z&nbsp;nich rychle získat informaci, rozhodnutí a&nbsp;další akci.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 02 · REALITY CHECK ══════╗ -->
+    <div class="slide" data-slide="2" data-title="Reality check" data-num="02">
+      <div class="slide-num">02</div>
+      <h2>Data nejsou asset, dokud je neumíme použít</h2>
+      <p class="lead">Většina firem nemá dokonalá data. Jsou nečistá, roztříštěná, různě pojmenovaná a&nbsp;často schovaná v&nbsp;konverzacích. To ale není důvod nezačít.</p>
+      <blockquote>
+        „Data jsou aktivem — ale jejich hodnota nespočívá v&nbsp;tom, že je máme. Hodnota je v&nbsp;tom, jestli je dokážeme využít."
+        <span class="quote-author">— hlavní teze modulu</span>
+      </blockquote>
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--green);">Co potřebujete</div>
+          <ul>
+            <li>Znalost vlastní práce a&nbsp;dobré otázky.</li>
+            <li>Ochotu zkoušet nové nástroje a&nbsp;AI pro práci s&nbsp;daty.</li>
+            <li>Přehled, kdy použít chatbota, tabulku nebo skript.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">Co nepotřebujete</div>
+          <ul>
+            <li>Být datový vědec.</li>
+            <li>Čekat na perfektní datový sklad.</li>
+            <li>Automatizovat všechno hned od prvního dne.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 03 · KLÍČOVÉ KONCEPTY ══════╗ -->
+    <div class="slide" data-slide="3" data-title="Klíčové koncepty" data-num="03">
+      <div class="slide-num">03</div>
+      <h2>Klíčové koncepty</h2>
+      <p class="lead">Než začnete nahrávat tabulky do AI, potřebujete tři mentální modely: jaký typ dat máte, co z&nbsp;nich chcete získat a&nbsp;jaký kontext AI potřebuje.</p>
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">📊</div>
+          <div class="group-name">Typ dat</div>
+          <div class="group-subtitle">Strukturovaná vs. nestrukturovaná</div>
+          <div class="group-desc">Tabulky, CRM a&nbsp;finance se chovají jinak než e-maily, smlouvy, meetingy nebo chaty.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🧠</div>
+          <div class="group-name">Znalost je víc než data</div>
+          <div class="group-subtitle">Data → informace → znalost</div>
+          <div class="group-desc">Cílem není jen souhrn. Cílem je pochopit vzorce, rozhodnout se a&nbsp;posunout práci dál.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🧩</div>
+          <div class="group-name">Kontext</div>
+          <div class="group-subtitle">Prompt nestačí</div>
+          <div class="group-desc">AI potřebuje instrukci, data, doménové znalosti a&nbsp;vzor výstupu.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 03.1 · TYPY DAT ══════╗ -->
+    <div class="slide" data-slide="4" data-title="Typy dat" data-sub="true">
+      <div class="slide-num">03.1</div>
+      <h2>Strukturovaná vs. nestrukturovaná data</h2>
+      <p class="lead">Toto dělení rozhoduje o&nbsp;tom, jak data připravíte, čím je zpracujete a&nbsp;jak moc můžete věřit výsledku.</p>
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--blue);">Strukturovaná data</div>
+          <ul>
+            <li>Tabulky, databáze, CRM, formuláře, finanční výkazy.</li>
+            <li>Mají sloupce, kategorie a&nbsp;jasnou strukturu.</li>
+            <li>Snadno se filtrují, spojují, čistí a&nbsp;počítají.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--purple);">Nestrukturovaná data</div>
+          <ul>
+            <li>E-maily, smlouvy, prezentace, obrázky, meetingy, chaty.</li>
+            <li>Nemají jednotný formát, ale často obsahují největší znalost.</li>
+            <li>S&nbsp;AI se dají shrnovat, třídit, extrahovat a&nbsp;převádět do struktury.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p><strong>Praktická pointa:</strong> možná největší hodnota v&nbsp;datech leží v&nbsp;našich konverzacích — protože tam je znalost, kterou pak můžeme dostat do AI agentů.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 03.2 · DIKW ══════╗ -->
+    <div class="slide" data-slide="5" data-title="Data → moudrost" data-sub="true">
+      <div class="slide-num">03.2</div>
+      <h2>Data, informace, znalosti, moudrost</h2>
+      <p class="lead">DIKW pyramida ukazuje, že data sama o&nbsp;sobě nestačí. Hodnota vzniká až ve chvíli, kdy z&nbsp;nich umíme udělat rozhodnutí.</p>
+      <div class="group-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="group-card">
+          <div class="group-icon">1</div>
+          <div class="group-name">Data</div>
+          <div class="group-subtitle">Surový materiál</div>
+          <div class="group-desc">Řádky, soubory, transakce, zprávy, dokumenty. Ještě neříkají, co z&nbsp;nich plyne.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">2</div>
+          <div class="group-name">Informace</div>
+          <div class="group-subtitle">Organizovaný pohled</div>
+          <div class="group-desc">Souhrny, trendy, segmenty, grafy a&nbsp;odpovědi na konkrétní otázky.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">3</div>
+          <div class="group-name">Znalost</div>
+          <div class="group-subtitle">Co s&nbsp;tím uděláme</div>
+          <div class="group-desc">Doporučení, rozhodnutí, hypotézy, priority a&nbsp;procesy, které se dají opakovat.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">4</div>
+          <div class="group-name">Moudrost</div>
+          <div class="group-subtitle">Kdy a&nbsp;proč jednat</div>
+          <div class="group-desc">Schopnost posoudit kontext, hodnoty a&nbsp;dlouhodobý dopad. Vědět, kdy data nestačí a&nbsp;kdy je důležitější úsudek.</div>
+        </div>
+      </div>
+      <blockquote>
+        „Instead of creating knowledge, we're creating the processes that generate knowledge."
+        <span class="quote-author">— Frank, citováno v&nbsp;modulu</span>
+      </blockquote>
+    </div>
+
+    <!-- ╔══════ 03.3 · NESTRUKTUROVANÁ DATA ══════╗ -->
+    <div class="slide" data-slide="6" data-title="Nestrukturovaná data" data-sub="true">
+      <div class="slide-num">03.3</div>
+      <h2>Jaká nestrukturovaná data analyzovat</h2>
+      <p class="lead">Nejcennější data často nejsou v&nbsp;tabulkách. Jsou v&nbsp;zápisech, konverzacích a&nbsp;vašich vlastních AI chatech — stačí je začít vytěžovat.</p>
+      <div class="deliverable-grid">
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📝</div>
+            <div class="del-name">Zápisy z&nbsp;porad</div>
+          </div>
+          <div class="del-desc">Jednorázově: co jsme rozhodli. Průběžně: jaké vzorce se opakují, co se nedotáhlo, jaká témata se vrací měsíc po měsíci.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">💬</div>
+            <div class="del-name">Konverzace v&nbsp;týmu</div>
+          </div>
+          <div class="del-desc">Slack, Teams, e-maily. Kde trávíte čas, jaká témata dominují, kde se ztrácí informace a&nbsp;kde vznikají rozhodnutí.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🤖</div>
+            <div class="del-name">Konverzace s&nbsp;AI</div>
+          </div>
+          <div class="del-desc">Vyexportujte si chaty s&nbsp;AI a&nbsp;nechte je analyzovat. Jak promptujete, kde se zasekáváte, co by šlo dělat lépe.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📊</div>
+            <div class="del-name">Zpětná vazba a&nbsp;ankety</div>
+          </div>
+          <div class="del-desc">NPS, interní ankety, reviews. Ne jako číslo, ale jako zdroj vzorců a&nbsp;příběhů pro rozhodování.</div>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p><strong>Tip:</strong> Nejde jen o&nbsp;jednorázovou analýzu. Největší hodnota je v&nbsp;opakovaném pohledu — co se změnilo za měsíc, za kvartál, za rok.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 03.4 · CONTEXT ENGINEERING ══════╗ -->
+    <div class="slide" data-slide="7" data-title="Prompt vs. kontext" data-sub="true">
+      <div class="slide-num">03.4</div>
+      <h2>Prompt engineering vs. context engineering</h2>
+      <p class="lead">Prompt je instrukce. Kontext je všechno, co AI potřebuje, aby mohla odvést kvalitní práci: data, pravidla, doménové znalosti, nástroje, historii a&nbsp;vzor ideálního výstupu.</p>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Prompt engineering</th>
+            <th>Context engineering</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vhodné pro</td>
+            <td class="col-old">Jednorázové dotazy a&nbsp;rychlé úkoly</td>
+            <td class="col-new">Agenty, opakovatelné workflow a&nbsp;kvalitní výstupy</td>
+          </tr>
+          <tr>
+            <td>Vstup</td>
+            <td class="col-old">Instrukce v&nbsp;chatu</td>
+            <td class="col-new">Instrukce + data + vzory + nástroje + pravidla</td>
+          </tr>
+          <tr>
+            <td>Riziko</td>
+            <td class="col-old">AI si domýšlí chybějící souvislosti</td>
+            <td class="col-new">AI má oporu v&nbsp;konkrétním kontextu</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Praktický trik:</strong> často je lepší dát AI ideální příklad výstupu než dlouhý popis toho, jak má výstup vypadat.</p>
+    </div>
+
+    <!-- ╔══════ 04 · SCÉNÁŘE ══════╗ -->
+    <div class="slide" data-slide="8" data-title="Nejlepší scénáře" data-num="04">
+      <div class="slide-num">04</div>
+      <h2>Nejlepší scénáře pro využití AI</h2>
+      <p class="lead">AI je nejsilnější tam, kde potřebujete rychle proměnit neuspořádaný vstup v&nbsp;použitelný podklad pro práci, rozhodnutí nebo automatizaci.</p>
+      <div class="deliverable-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🧼</div>
+            <div class="del-name">Vyčistit a&nbsp;sjednotit data</div>
+          </div>
+          <div class="del-desc">Odstranit duplicity, sjednotit názvy, doplnit kontext a&nbsp;připravit data pro analýzu.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📈</div>
+            <div class="del-name">Analyzovat velké objemy</div>
+          </div>
+          <div class="del-desc">Zpracovat tabulky, exporty, dokumenty i&nbsp;další formáty rychleji než ručně.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">💡</div>
+            <div class="del-name">Získat insighty</div>
+          </div>
+          <div class="del-desc">Převést data na podklady pro strategii, reporting, rozhodování a&nbsp;další akci.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📊</div>
+            <div class="del-name">Vytvořit vizuální report</div>
+          </div>
+          <div class="del-desc">Nechat AI postavit interaktivní HTML report, dashboard nebo webovou stránku s&nbsp;daty.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🤖</div>
+            <div class="del-name">Připravit data pro AI</div>
+          </div>
+          <div class="del-desc">Připravit kontext, který zvyšuje kvalitu výstupů agentů a&nbsp;opakovaných workflow.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🔄</div>
+            <div class="del-name">Automatizovat opakující se úlohy</div>
+          </div>
+          <div class="del-desc">Nastavit workflow pro pravidelné reporty, čištění dat nebo zpracování nových záznamů.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 04.1 · JEDNORÁZOVĚ VS. PRAVIDELNĚ ══════╗ -->
+    <div class="slide" data-slide="9" data-title="Jednorázově vs. pravidelně" data-sub="true">
+      <div class="slide-num">04.1</div>
+      <h2>Jednorázová vs. pravidelná práce s&nbsp;daty</h2>
+      <p class="lead">Stejný typ problému vyžaduje jiný přístup podle toho, jestli ho řešíte jednou, nebo každý týden.</p>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Jednorázová práce</th>
+            <th>Pravidelná práce</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Příklady</td>
+            <td class="col-old">Analýza klientů, sloučení kontaktů, extrakce dat z&nbsp;PDF, porovnání dodavatelů</td>
+            <td class="col-new">Měsíční reporty, monitoring cen, lead enrichment, kampaně, cashflow predikce</td>
+          </tr>
+          <tr>
+            <td>Přístup</td>
+            <td class="col-old">Stačí znát toolkit a&nbsp;vybrat správný nástroj</td>
+            <td class="col-new">Vyplatí se postavit workflow, skript nebo automatizaci</td>
+          </tr>
+          <tr>
+            <td>Cíl</td>
+            <td class="col-old">Rychle získat odpověď nebo jednorázově vyčistit data</td>
+            <td class="col-new">Snížit ruční práci a&nbsp;vytvořit opakovatelný proces</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Pravidlo:</strong> nejdřív si úkol projděte ručně s&nbsp;AI. Automatizujte až ve chvíli, kdy rozumíte vstupu, výstupu a&nbsp;kontrole kvality.</p>
+    </div>
+
+    <!-- ╔══════ 04.2 · JEDNOTLIVĚ VS. HROMADNĚ ══════╗ -->
+    <div class="slide" data-slide="10" data-title="Jednotlivě vs. hromadně" data-sub="true">
+      <div class="slide-num">04.2</div>
+      <h2>Jednotlivě vs. hromadně</h2>
+      <p class="lead">Jiný objem dat vyžaduje jiný přístup. To, co zvládnete ručně s&nbsp;pěti dokumenty, u&nbsp;stovek potřebuje automatizaci nebo skript.</p>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Jednotlivě (5–10 dokumentů)</th>
+            <th>Hromadně (desítky–tisíce)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Příklady</td>
+            <td class="col-old">Vytáhnout info z&nbsp;5 smluv, porovnat nabídky, sumarizovat zápisy z&nbsp;porad</td>
+            <td class="col-new">Zpracovat 500 faktur, otagovat tisíce kontaktů, analyzovat stovky recenzí</td>
+          </tr>
+          <tr>
+            <td>Přístup</td>
+            <td class="col-old">Chatbot — nahrajete soubor a&nbsp;ptáte se</td>
+            <td class="col-new">Automatizace (Power Automate, Relay), Copilot Studio, nebo skript přes API</td>
+          </tr>
+          <tr>
+            <td>Cíl</td>
+            <td class="col-old">Rychlá odpověď nebo strukturovaný výtah z&nbsp;malého vzorku</td>
+            <td class="col-new">Škálovatelné zpracování bez manuálního zásahu</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Skript přes API:</strong> Necháte si napsat skript (např. v&nbsp;Cursoru nebo Claude Code), který volá AI model přes API — řádek po řádku, soubor po souboru. Vy nemusíte umět programovat. Stačí popsat úkol a&nbsp;AI vám skript napíše, spustí i&nbsp;zkontroluje výstup.</p>
+    </div>
+
+    <!-- ╔══════ 04.3 · 10 SCÉNÁŘŮ ══════╗ -->
+    <div class="slide" data-slide="11" data-title="10 scénářů" data-sub="true">
+      <div class="slide-num">04.3</div>
+      <h2>Deset typových scénářů</h2>
+      <p class="lead">Většina datových use casů ve firmě spadne do několika opakujících se kategorií. Důležité je poznat vzorec, ne znát každý nástroj.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div><div class="session-title">📊 Analýza zpětné vazby od zákazníků</div><div class="session-desc">Mám stovky hodnocení a&nbsp;zpětných vazeb v&nbsp;různých formátech. Chtěl bych z&nbsp;nich vytáhnout hlavní témata a&nbsp;insighty.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div><div class="session-title">📈 Pravidelný reporting projektů/aktivit</div><div class="session-desc">Potřebuji každý týden/měsíc sestavit přehled stavu projektů, úkolů a&nbsp;metrik. Aktuálně to dělám ručně a&nbsp;zabere mi to hodiny.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div><div class="session-title">🧹 Čištění a&nbsp;organizace kontaktů</div><div class="session-desc">Mám tisíce kontaktů v&nbsp;různých systémech, duplikáty, neúplné informace. Chtěl bych je vyčistit a&nbsp;kategorizovat.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div><div class="session-title">📧 Analýza e-mailové komunikace</div><div class="session-desc">Chtěl bych analyzovat své e-maily — s&nbsp;kým nejvíc komunikuji, jaká témata řeším, kde trávím nejvíc času.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">05</div>
+          <div><div class="session-title">💰 Finanční reporting a&nbsp;analýza výdajů</div><div class="session-desc">Mám data o&nbsp;výdajích, příjmech, rozpočtech v&nbsp;různých tabulkách. Chtěl bych automatizovat měsíční reporty.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">06</div>
+          <div><div class="session-title">📝 Zpracování přepisů ze schůzek/porad</div><div class="session-desc">Mám hodiny audio/video záznamů nebo přepisů. Chtěl bych z&nbsp;nich vytahovat action items, rozhodnutí a&nbsp;klíčové informace.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">07</div>
+          <div><div class="session-title">🎯 Analýza výkonnosti týmu/jednotlivců</div><div class="session-desc">Potřebuji analyzovat produktivitu, dokončené úkoly, time tracking data a&nbsp;vytvářet z&nbsp;toho smysluplné reporty.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">08</div>
+          <div><div class="session-title">🛒 Analýza prodejních dat a&nbsp;trendů</div><div class="session-desc">Mám data o&nbsp;prodejích, klientech, produktech. Chci identifikovat trendy, nejlepší zákazníky a&nbsp;opportunities.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">09</div>
+          <div><div class="session-title">📱 Analýza sociálních sítí a&nbsp;marketingových dat</div><div class="session-desc">Chtěl bych analyzovat své posty, engagement, reach a&nbsp;optimalizovat svou komunikační strategii.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">10</div>
+          <div><div class="session-title">📋 Automatizace opakujících se reportů</div><div class="session-desc">Mám reporty, které dělám pravidelně stejně — chtěl bych je automatizovat a&nbsp;nechat AI generovat textové souhrny.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05 · NÁSTROJE ══════╗ -->
+    <div class="slide" data-slide="12" data-title="Nástroje" data-num="05">
+      <div class="slide-num">05</div>
+      <h2>Čtyři typy nástrojů pro práci s&nbsp;daty</h2>
+      <p class="lead">Hodnota je v&nbsp;tom, že poznáte, kdy co použít. Každý typ řeší jiný problém — od jednoho řádku po tisíce dokumentů.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">📊</div>
+          <div><div class="session-title">AI v&nbsp;tabulkách</div><div class="session-desc">Excel s&nbsp;Copilotem, Google Sheets s&nbsp;=AI. AI funkce v&nbsp;buňkách + AI panel vedle tabulky pro konverzaci s&nbsp;daty.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">💬</div>
+          <div><div class="session-title">Chat</div><div class="session-desc">Claude, ChatGPT, Gemini, Copilot. Rychlá explorace menších datasetů, musím kopírovat a&nbsp;vkládat.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">🤝</div>
+          <div><div class="session-title">Cowork</div><div class="session-desc">AI pracuje přímo s&nbsp;mými soubory na disku. Pochopí záměr, naplánuje, realizuje. Nemusím programovat.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">⌨️</div>
+          <div><div class="session-title">Code</div><div class="session-desc">Cursor, Claude Code, Codex. Napojení na DB, API, opakovatelné skripty. Největší možnosti.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.1 · TŘI GENERACE ══════╗ -->
+    <div class="slide" data-slide="13" data-title="Tři generace práce s daty" data-sub="true">
+      <div class="slide-num">05.1</div>
+      <h2>Tři generace práce s&nbsp;daty</h2>
+      <p class="lead">Evoluce od tabulek přes business intelligence k&nbsp;novému paradigmatu: ptát se dat přirozeným jazykem.</p>
+
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">📊</div>
+          <div class="group-name">1. generace</div>
+          <div class="group-subtitle">Tabulky a manuální práce</div>
+          <div class="group-desc">Excel, ruční zpracování, vzorce. Člověk dělá všechno sám — od strukturování po vizualizaci.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">📈</div>
+          <div class="group-name">2. generace</div>
+          <div class="group-subtitle">Business Intelligence</div>
+          <div class="group-desc">Power BI, Tableau, Looker Studio. Dashboardy, reporty, proklikávání dat. Řada lidí potvrzuje, že klasická BI, jak ji známe, bude využívána minimálně.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🗣️</div>
+          <div class="group-name">3. generace</div>
+          <div class="group-subtitle">Talk to data</div>
+          <div class="group-desc">Přirozený jazyk, okamžité insights, konverzace s&nbsp;daty přes AI. Nebudete naklikávat reporty, ale ptát se na to, co vás zajímá.</div>
+        </div>
+      </div>
+
+      <div class="verdict-box">
+        <p><strong>Směr:</strong> Budoucnost není v&nbsp;lepších dashboardech. Je v&nbsp;tom, že se dat zeptáte otázkou a&nbsp;dostanete odpověď — jako byste měli osobního analytika.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.2 · CHAT ══════╗ -->
+    <div class="slide" data-slide="14" data-title="Chat" data-sub="true">
+      <div class="slide-num">05.2</div>
+      <h2>Chat — možnosti a&nbsp;omezení</h2>
+      <p class="lead">Klasické chatovací rozhraní — Claude, ChatGPT, Gemini, Copilot. 90&nbsp;% toho, co lidé s&nbsp;AI dělají. Hlavní síla: rychlá analýza a&nbsp;práce s&nbsp;textem.</p>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Strukturovaná data (tabulky, CSV)</th>
+            <th>Nestrukturovaná data (texty, PDF)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Možnosti</strong></td>
+            <td class="col-old">Menší tabulku analyzuje, shrne, napíše vzorce, navrhne grafy. Umí spouštět Python a&nbsp;vykreslit graf.</td>
+            <td class="col-new">Sumarizace, překlad, extrakce klíčových bodů, analýza tónu. Upload PDF a&nbsp;okamžitá práce.</td>
+          </tr>
+          <tr>
+            <td><strong>Omezení</strong></td>
+            <td class="col-old">Omezený kontext — velké soubory se nevejdou. Musím kopírovat a&nbsp;vkládat. Výstupy jsou statické.</td>
+            <td class="col-new">Dlouhé dokumenty se musí dělit. Každý soubor uploduji ručně — nemůžu říct „projdi celou složku".</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Bonus — Researcher (Copilot):</strong> Mód v&nbsp;Microsoft Copilot, který autonomně prohledá stovky zdrojů a&nbsp;vytvoří detailní report. Skvělé pro rešerše a&nbsp;ověřování.</p>
+    </div>
+
+    <!-- ╔══════ 05.3 · COWORK ══════╗ -->
+    <div class="slide" data-slide="15" data-title="Cowork" data-sub="true">
+      <div class="slide-num">05.3</div>
+      <h2>Cowork — práce se soubory</h2>
+      <p class="lead">AI pracuje přímo s&nbsp;mými soubory a&nbsp;složkami na počítači. Má agentské funkce — pochopí záměr, naplánuje a&nbsp;realizuje. Nemusím být programátor.</p>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Strukturovaná data</th>
+            <th>Nestrukturovaná data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Možnosti</strong></td>
+            <td class="col-old">Otevře Excel/CSV/JSON přímo. Vytvoří nový .xlsx, spustí analýzu, uloží výsledek. Řetězí kroky: načti → filtruj → spočítej → ulož.</td>
+            <td class="col-new">Pracuje s&nbsp;celými složkami najednou. „Projdi všechny PDF a&nbsp;vytáhni klíčové podmínky." Kombinace čtení a&nbsp;psaní.</td>
+          </tr>
+          <tr>
+            <td><strong>Omezení</strong></td>
+            <td class="col-old">Jen soubory, ne živá databáze. U&nbsp;milionů řádků naráží na paměť. Nemá GUI pro interaktivní zkoumání.</td>
+            <td class="col-new">Skenovaná PDF bez OCR mohou být problém. U&nbsp;velkého množství dokumentů naráží na rychlost.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Nástroje:</strong> Claude Desktop (Cowork mód), Copilot v&nbsp;rámci M365.</p>
+    </div>
+
+    <!-- ╔══════ 05.4 · CODE ══════╗ -->
+    <div class="slide" data-slide="16" data-title="Code" data-sub="true">
+      <div class="slide-num">05.4</div>
+      <h2>Code — skripty a&nbsp;pipeline</h2>
+      <p class="lead">Plný přístup k&nbsp;programovacímu prostředí. AI napíše skript, který data zpracuje programaticky, výsledek validuje a&nbsp;dá se spustit znovu.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Scénář</th>
+            <th>Proč Code</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Spojit 5+ tabulek a&nbsp;složek</td>
+            <td>Automatické načtení, sjednocení sloupců, kontrola duplicit.</td>
+          </tr>
+          <tr>
+            <td>Zpracovat tisíce řádků</td>
+            <td>Menší riziko halucinací, validace, logování chyb.</td>
+          </tr>
+          <tr>
+            <td>Obohatit CRM z&nbsp;webu</td>
+            <td>Napojení na API, scraping, klasifikace, export zpět.</td>
+          </tr>
+          <tr>
+            <td>Hromadné zpracování dokumentů</td>
+            <td>NLP analýza, klasifikace, RAG systémy, embeddings.</td>
+          </tr>
+          <tr>
+            <td>Opakovat report pravidelně</td>
+            <td>Stejný proces, stejné kontroly, méně ruční práce.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Nástroje:</strong> Cursor, Claude Code, Codex. Nemusíte umět programovat — stačí popsat úkol a&nbsp;AI skript napíše.</p>
+    </div>
+
+    <!-- ╔══════ 05.5 · AI FUNKCE V TABULKÁCH ══════╗ -->
+    <div class="slide" data-slide="17" data-title="AI v tabulkách" data-sub="true">
+      <div class="slide-num">05.5</div>
+      <h2>AI funkce přímo v&nbsp;tabulkách</h2>
+      <p class="lead">Zadáte funkci do buňky s&nbsp;promptem a&nbsp;odkazem na data — AI zpracuje výsledek přímo v&nbsp;gridu. Skvělé pro hromadné zpracování stovek řádků stejným způsobem.</p>
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--blue);">=COPILOT (Excel)</div>
+          <ul>
+            <li><code>=COPILOT(prompt, kontext)</code> — součást výpočetního enginu</li>
+            <li>Agentské schopnosti od dubna 2026 — vícekrokové akce</li>
+            <li>Limit: 100 volání/10 min, 300/hodinu</li>
+            <li>Vyžaduje M365 + Copilot licenci ($20–30/měsíc)</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">=AI (Google Sheets)</div>
+          <ul>
+            <li><code>=AI("prompt", A2:C2)</code> — generování, kategorizace, sentiment</li>
+            <li>Fill with Gemini — automatické doplňování drag-and-drop</li>
+            <li>Limit: max 200 buněk s&nbsp;AI funkcí najednou</li>
+            <li>Vyžaduje Workspace Business+ nebo Google One AI Premium</li>
+          </ul>
+        </div>
+      </div>
+      <p><strong>Kdy použít:</strong> Potřebujete zpracovat velké množství položek stejným způsobem — přeložit 150 popisků, zkrátit 200 recenzí, přiřadit kategorii ke každému ticketu. Data zůstávají tam, kde jsou.</p>
+    </div>
+
+    <!-- ╔══════ 05.6 · ZÍSKÁVÁNÍ DAT ══════╗ -->
+    <div class="slide" data-slide="18" data-title="Získávání dat z webu" data-sub="true">
+      <div class="slide-num">05.6</div>
+      <h2>Získávání dat — lokálně, API, web</h2>
+      <p class="lead">Než začnete analyzovat, potřebujete data dostat. Tři cesty: export ze systémů, napojení přes API, nebo stažení z&nbsp;webu.</p>
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">📤</div>
+          <div class="group-name">Export ze systémů</div>
+          <div class="group-subtitle">Lokální soubory</div>
+          <div class="group-desc">Notion export, Google Takeout, CRM exporty, bankovní výpisy. Stále více nástrojů generuje data „LLM-ready".</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🔌</div>
+          <div class="group-name">API</div>
+          <div class="group-subtitle">Programatický přístup</div>
+          <div class="group-desc">Napojení na libovolný systém přes jeho API. Skript zavolá, stáhne, zpracuje — automaticky a&nbsp;opakovatelně.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🌐</div>
+          <div class="group-name">Web scraping</div>
+          <div class="group-subtitle">Data z webu</div>
+          <div class="group-desc">Apify, Firecrawl — stáhnou data z&nbsp;webových stránek, katalogů, registrů. Firecrawl generuje výstup optimalizovaný pro AI.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.7 · SPECIALIZOVANÉ NÁSTROJE ══════╗ -->
+    <div class="slide" data-slide="19" data-title="Knihovny a specializované nástroje" data-sub="true">
+      <div class="slide-num">05.7</div>
+      <h2>Knihovny a&nbsp;specializované nástroje</h2>
+      <p class="lead">Pro pokročilejší práci s&nbsp;daty existuje ekosystém nástrojů, které rozšiřují možnosti chatu i&nbsp;kódu.</p>
+      <div class="deliverable-grid">
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🐍</div>
+            <div class="del-name"><a href="https://streamlit.io/" target="_blank" style="color: inherit; text-decoration: underline;">Python + Streamlit</a></div>
+          </div>
+          <div class="del-desc">Python pro zpracování dat (pandas, numpy), Streamlit pro rychlé interaktivní dashboardy bez frontendu.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🦆</div>
+            <div class="del-name"><a href="https://duckdb.org/" target="_blank" style="color: inherit; text-decoration: underline;">DuckDB</a></div>
+          </div>
+          <div class="del-desc">Analytická databáze, která běží lokálně. SQL dotazy nad CSV, Parquet, JSON — bez serveru, bleskově rychlá.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🔬</div>
+            <div class="del-name"><a href="https://colab.research.google.com/" target="_blank" style="color: inherit; text-decoration: underline;">Google Colab</a></div>
+          </div>
+          <div class="del-desc">Python v&nbsp;prohlížeči zdarma. Ideální pro experimenty s&nbsp;daty bez instalace čehokoliv na vlastní počítač.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🏭</div>
+            <div class="del-name"><a href="https://www.keboola.com/" target="_blank" style="color: inherit; text-decoration: underline;">Keboola</a></div>
+          </div>
+          <div class="del-desc">Česká platforma pro datové pipeline. Napojení na 250+ zdrojů, transformace, orchestrace a&nbsp;AI nad daty.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📄</div>
+            <div class="del-name"><a href="https://unstructured.io/" target="_blank" style="color: inherit; text-decoration: underline;">Unstructured.io</a></div>
+          </div>
+          <div class="del-desc">Zpracování nestrukturovaných dokumentů — PDF, Word, HTML, obrázky. Převod do formátu pro AI a&nbsp;RAG systémy.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🗂️</div>
+            <div class="del-name"><a href="https://www.airtable.com/" target="_blank" style="color: inherit; text-decoration: underline;">Airtable</a> / <a href="https://learn.microsoft.com/en-us/power-apps/maker/data-platform/data-platform-intro" target="_blank" style="color: inherit; text-decoration: underline;">Dataverse</a></div>
+          </div>
+          <div class="del-desc">Databáze pro běžné uživatele s&nbsp;vestavěnou AI. Formuláře, pohledy, automatizace — data mají dobré místo k&nbsp;životu.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.8 · ORCHESTRATE ══════╗ -->
+    <div class="slide" data-slide="20" data-title="Orchestrate" data-sub="true">
+      <div class="slide-num">05.8</div>
+      <h2>Orchestrate — automatizace a&nbsp;propojení</h2>
+      <p class="lead">Když potřebujete hromadně zpracovat data, propojit systémy nebo nastavit pravidelné workflow bez programování.</p>
+      <div class="deliverable-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🔗</div>
+            <div class="del-name"><a href="https://relay.app" target="_blank" style="color: inherit; text-decoration: underline;">Relay</a></div>
+          </div>
+          <div class="del-desc">AI-native automatizace. Propojení systémů s&nbsp;inteligentním zpracováním dat mezi kroky.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🤖</div>
+            <div class="del-name">Copilot Studio</div>
+          </div>
+          <div class="del-desc">Microsoft ekosystém. Agenti napojení na SharePoint, Teams, Dataverse. Enterprise ready.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">⚡</div>
+            <div class="del-name"><a href="https://n8n.io" target="_blank" style="color: inherit; text-decoration: underline;">n8n</a></div>
+          </div>
+          <div class="del-desc">Open-source workflow. Vizuální editor, stovky integrací, self-hosted nebo cloud.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🔄</div>
+            <div class="del-name"><a href="https://make.com" target="_blank" style="color: inherit; text-decoration: underline;">Make</a></div>
+          </div>
+          <div class="del-desc">Vizuální automatizace. Hromadná práce s&nbsp;daty, transfer mezi systémy, naplánované běhy.</div>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <strong>Kdy použít:</strong> Máte opakující se úlohy, potřebujete propojit více systémů, nebo zpracovat data hromadně bez manuálního zásahu.
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.9 · KDY PŘERŮST CHAT — STRUKTUROVANÁ DATA ══════╗ -->
+    <div class="slide" data-slide="21" data-title="Kdy přerůst chat — strukturovaná data" data-sub="true">
+      <div class="slide-num">05.9</div>
+      <h2>Kdy přerůst chat — strukturovaná data</h2>
+      <p class="lead">Začni vlevo. Pokud vidíš ⚠️ nebo ❌, posuň se doprava — tam najdeš nástroj, který to zvládne.</p>
+      <table>
+        <thead>
+          <tr><th>Use case</th><th>💬 Chat</th><th>🤝 Cowork</th><th>⌨️ Code</th><th>🔄 Orchestrate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Analýza 1–2 malých tabulek</td><td>✅ Stačí nahrát</td><td>✅ Ještě snazší</td><td>✅ Plná kontrola</td><td>⚠️ Zbytečně složité</td></tr>
+          <tr><td>Spojení 5+ tabulek a&nbsp;složek</td><td>⚠️ Ruční příprava</td><td>✅ Přímo se soubory</td><td>✅ Automaticky</td><td>✅ Automaticky</td></tr>
+          <tr><td>Opakovaná analýza (weekly)</td><td>❌ Vždy znovu ručně</td><td>⚠️ Poloautomaticky</td><td>✅ Plná automatizace</td><td>✅ Naplánované běhy</td></tr>
+          <tr><td>Zpracování tisíců řádků</td><td>⚠️ Limitováno kontextem</td><td>✅ Pracuje lokálně</td><td>✅ Bez limitu</td><td>✅ Bez limitu</td></tr>
+          <tr><td>Napojení na živou DB / API</td><td>❌ Není možné</td><td>⚠️ Přes MCP servery</td><td>✅ Přímé propojení</td><td>✅ Nativní konektory</td></tr>
+        </tbody>
+      </table>
+      <div class="verdict-box">
+        <strong>Princip:</strong> Chat pro rychlou exploraci. Cowork jako průlom 2026 — pracuje přímo s&nbsp;tvými soubory. Code a&nbsp;Orchestrate pro opakování, velké objemy a&nbsp;napojení na systémy.
+      </div>
+    </div>
+
+    <!-- ╔══════ 05.10 · KDY PŘERŮST CHAT — NESTRUKTUROVANÁ DATA ══════╗ -->
+    <div class="slide" data-slide="22" data-title="Kdy přerůst chat — nestrukturovaná data" data-sub="true">
+      <div class="slide-num">05.10</div>
+      <h2>Kdy přerůst chat — nestrukturovaná data</h2>
+      <p class="lead">Dokumenty, texty, zpětná vazba, e-maily — stejný princip: začni vlevo, posuň se doprava podle potřeby.</p>
+      <table>
+        <thead>
+          <tr><th>Use case</th><th>💬 Chat</th><th>🤝 Cowork</th><th>⌨️ Code</th><th>🔄 Orchestrate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Analýza 1–2 dokumentů</td><td>✅ Stačí nahrát</td><td>✅ Ještě snazší</td><td>✅ Plná kontrola</td><td>⚠️ Zbytečně složité</td></tr>
+          <tr><td>Zpracování desítek stránek</td><td>⚠️ Limitováno kontextem</td><td>✅ Čte z&nbsp;disku</td><td>✅ Automaticky</td><td>✅ Automaticky</td></tr>
+          <tr><td>Prohledávání stovek dokumentů</td><td>❌ Nelze</td><td>⚠️ Lokální soubory</td><td>✅ RAG / vektorová DB</td><td>✅ S&nbsp;indexací</td></tr>
+          <tr><td>Průběžná aktualizace znalostní báze</td><td>❌ Není možné</td><td>⚠️ Manuální spouštění</td><td>✅ Automatická indexace</td><td>✅ Naplánované běhy</td></tr>
+          <tr><td>Kategorizace a&nbsp;tagování zpětné vazby</td><td>✅ Malý objem</td><td>✅ Střední objem</td><td>✅ Tisíce záznamů</td><td>✅ Průběžně z&nbsp;více zdrojů</td></tr>
+        </tbody>
+      </table>
+      <div class="verdict-box">
+        <strong>Princip:</strong> Jeden dokument? Chat stačí. Desítky souborů? Cowork. Stovky+ nebo průběžný tok? Code nebo Orchestrate.
+      </div>
+    </div>
+
+    <!-- ╔══════ 06 · PĚT FÁZÍ ══════╗ -->
+    <div class="slide" data-slide="23" data-title="Pět fází" data-num="06">
+      <div class="slide-num">06</div>
+      <h2>Pět fází práce s&nbsp;daty</h2>
+      <p class="lead">Chytrá práce s&nbsp;daty není jeden prompt. Je to životní cyklus: získat, uložit, zpracovat, reportovat a&nbsp;automatizovat.</p>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 24px;">
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 14px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 10px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; margin-bottom: 10px;">01</span>
+          <h4 style="color: var(--blue); font-size: 1rem; margin-bottom: 6px;">Získat</h4>
+          <p style="font-size: 0.86rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Exporty, API, scraping, formuláře</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 14px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 10px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; margin-bottom: 10px;">02</span>
+          <h4 style="color: var(--blue); font-size: 1rem; margin-bottom: 6px;">Uložit</h4>
+          <p style="font-size: 0.86rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Tabulky, Airtable, databáze</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 14px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 10px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; margin-bottom: 10px;">03</span>
+          <h4 style="color: var(--blue); font-size: 1rem; margin-bottom: 6px;">Zpracovat</h4>
+          <p style="font-size: 0.86rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Čištění, deduplikace, enrichment</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 14px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 10px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; margin-bottom: 10px;">04</span>
+          <h4 style="color: var(--blue); font-size: 1rem; margin-bottom: 6px;">Reportovat</h4>
+          <p style="font-size: 0.86rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Insight, graf, rozhodnutí</p>
+        </div>
+        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 14px; text-align: center;">
+          <span style="display: inline-block; background: var(--blue); color: white; padding: 2px 10px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; margin-bottom: 10px;">05</span>
+          <h4 style="color: var(--blue); font-size: 1rem; margin-bottom: 6px;">Automatizovat</h4>
+          <p style="font-size: 0.86rem; color: var(--gray-700); line-height: 1.5; margin: 0;">Workflow, agent, datová pipeline</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.1 · ZÍSKÁVÁNÍ DAT ══════╗ -->
+    <div class="slide" data-slide="24" data-title="Získávání dat" data-sub="true">
+      <div class="slide-num">06.1</div>
+      <h2>Fáze 1: Získávání dat</h2>
+      <p class="lead">Export z&nbsp;existujících systémů, web scraping nebo napojení přes API. Stále více nástrojů generuje data „LLM-ready" — přizpůsobená pro zpracování AI.</p>
+      <div class="deliverable-grid">
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📤</div>
+            <div class="del-name">Exporty ze systémů</div>
+          </div>
+          <div class="del-desc">Notion export, Google Takeout pro e-maily, CRM exporty, bankovní výpisy, LinkedIn, kalendáře.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🌐</div>
+            <div class="del-name">Web scraping a&nbsp;API</div>
+          </div>
+          <div class="del-desc">Firecrawl, Exa.ai, Apify, SERP API nebo přímé napojení na veřejné registry a&nbsp;databáze.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">📝</div>
+            <div class="del-name">Formuláře a&nbsp;sběr vstupů</div>
+          </div>
+          <div class="del-desc">Typeform, Airtable forms, interní dotazníky, ankety a&nbsp;meeting transcripts jako nové zdroje.</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-header">
+            <div class="del-icon">🤖</div>
+            <div class="del-name">LLM-ready formáty</div>
+          </div>
+          <div class="del-desc">Stále víc nástrojů exportuje data ve formátu optimalizovaném pro AI — markdown, strukturovaný JSON, chunked text.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.2 · UKLÁDÁNÍ DAT ══════╗ -->
+    <div class="slide" data-slide="25" data-title="Ukládání dat" data-sub="true">
+      <div class="slide-num">06.2</div>
+      <h2>Fáze 2: Ukládání dat</h2>
+      <p class="lead">Od tabulek přes databáze pro běžné uživatele až po specializované systémy. Základ pro automatizace i&nbsp;AI agenty.</p>
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">📊</div>
+          <div class="group-name">Tabulky</div>
+          <div class="group-subtitle">Rychlý start</div>
+          <div class="group-desc">Excel, Google Sheets. Dobré pro začátek, ale limitované pro automatizace a&nbsp;propojení.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🗂️</div>
+          <div class="group-name">Databáze pro lidi</div>
+          <div class="group-subtitle">Airtable, Notion, Lists</div>
+          <div class="group-desc">Formuláře, pohledy, propojené záznamy, automatizace. Data mají strukturu a&nbsp;žijí na jednom místě.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🏗️</div>
+          <div class="group-name">Specializované systémy</div>
+          <div class="group-subtitle">Postgres, Supabase</div>
+          <div class="group-desc">Pro vibe coding, AI agenty a&nbsp;produkční aplikace. Plná kontrola, škálovatelnost, API přístup.</div>
+        </div>
+      </div>
+      <p><strong>Pravidlo:</strong> Někdy není problém v&nbsp;AI. Někdy data jen nemají dobré místo k&nbsp;životu.</p>
+    </div>
+
+    <!-- ╔══════ 06.3 · ZPRACOVÁNÍ DAT ══════╗ -->
+    <div class="slide" data-slide="26" data-title="Zpracování dat" data-sub="true">
+      <div class="slide-num">06.3</div>
+      <h2>Fáze 3: Zpracování dat</h2>
+      <p class="lead">Chatboty pro jednoduché analýzy, AI v&nbsp;tabulkách pro hromadné zpracování, skripty pro komplexní úlohy, specializované platformy pro pokročilou analytiku.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div><div class="session-title">Čištění a&nbsp;deduplikace</div><div class="session-desc">Odstranit nepotřebné sloupce, duplicity, šum. Sjednotit názvy a&nbsp;formáty.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div><div class="session-title">Obohacení (enrichment)</div><div class="session-desc">Doplnit informace z&nbsp;webu, API, interních systémů. Přidat kontext, který v&nbsp;datech chybí.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div><div class="session-title">Kategorizace a&nbsp;klasifikace</div><div class="session-desc">AI přiřadí štítky, segmenty, sentiment, prioritu nebo typ — hromadně a&nbsp;konzistentně.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div><div class="session-title">Analýza a&nbsp;insight</div><div class="session-desc">Najít vzorce, anomálie, trendy a&nbsp;doporučení. Od dat k&nbsp;odpovědím.</div></div>
+        </div>
+      </div>
+      <p><strong>Nástroje:</strong> Chatboty (Claude, ChatGPT), AI v&nbsp;tabulkách (Copilot, Gemini), skripty (Cursor, Claude Code), platformy (Keboola, PandasAI).</p>
+    </div>
+
+    <!-- ╔══════ 06.4 · REPORTING ══════╗ -->
+    <div class="slide" data-slide="27" data-title="Reporting" data-sub="true">
+      <div class="slide-num">06.4</div>
+      <h2>Fáze 4: Reporting</h2>
+      <p class="lead">Tradiční BI nástroje i&nbsp;nová generace „talk to data", kde se ptáte přirozeným jazykem místo proklikávání dashboardů.</p>
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--blue);">Klasické BI</div>
+          <ul>
+            <li>Power BI, Tableau, Looker Studio</li>
+            <li>Dashboardy, vizualizace, drill-down</li>
+            <li>Funguje, ale vyžaduje nastavení a&nbsp;údržbu</li>
+            <li>Řada lidí potvrzuje, že klasická BI bude využívána minimálně</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">Nová generace: Talk to data + AI reporty</div>
+          <ul>
+            <li>Ptáte se přirozeným jazykem</li>
+            <li>Okamžité insighty bez konfigurace</li>
+            <li>AI vám postaví interaktivní HTML report nebo webovou stránku s&nbsp;daty</li>
+            <li>Keboola, Seda, PandasAI, ChatGPT, Claude, Cursor</li>
+          </ul>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p><strong>Směr:</strong> Nebudete naklikávat reporty, ale ptát se na to, co vás zajímá. A&nbsp;AI vám rovnou postaví interaktivní report jako webovou stránku — bez programování.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 06.5 · AUTOMATIZACE ══════╗ -->
+    <div class="slide" data-slide="28" data-title="Automatizace" data-sub="true">
+      <div class="slide-num">06.5</div>
+      <h2>Fáze 5: Automatizace</h2>
+      <p class="lead">Od jednoduchých automatizací v&nbsp;Airtable po vibe coding komplexních datových pipeline. Jakmile se úkol opakuje, vyplatí se ho automatizovat.</p>
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--blue);">Opakované workflow</div>
+          <ul>
+            <li>Nový lead → web enrichment → segment → návrh e-mailu</li>
+            <li>Meeting transcript → action items → report → Confluence</li>
+            <li>Nový dataset → čištění → graf → komentář → report</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">Agenti a&nbsp;pipeline</div>
+          <ul>
+            <li>AI agent s&nbsp;přístupem do Airtable/databáze</li>
+            <li>Pipeline: trigger → transform → výstup → kontrola</li>
+            <li>Vibe coding: popíšete slovně, AI postaví skript</li>
+          </ul>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p><strong>Posun:</strong> Nejde jen o&nbsp;to, jak zpracovat data jednou. Jde o&nbsp;to, jak vytvořit proces, který je zpracovává znovu a&nbsp;znovu — a&nbsp;pokaždé lépe.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 07 · KVALITA A BEZPEČNOST ══════╗ -->
+    <div class="slide" data-slide="29" data-title="Kvalita a bezpečnost" data-num="07">
+      <div class="slide-num">07</div>
+      <h2>Kvalita, důvěra a&nbsp;bezpečnost</h2>
+      <p class="lead">Práce s&nbsp;daty přes AI není jen o&nbsp;rychlosti. Potřebujete vědět, kdy AI věřit, kdy ověřovat a&nbsp;kam data vůbec smíte poslat.</p>
+      <div class="group-grid">
+        <div class="group-card">
+          <div class="group-icon">🧼</div>
+          <div class="group-name">Čistý vstup</div>
+          <div class="group-subtitle">Garbage in, garbage out</div>
+          <div class="group-desc">Čím méně šumu, tím přesnější výstup. Začněte kopií souboru, odstraňte nepotřebné a&nbsp;zúžte kontext.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🔍</div>
+          <div class="group-name">Ověření</div>
+          <div class="group-subtitle">Human in the loop</div>
+          <div class="group-desc">U&nbsp;kritických výstupů kontrolujte vzorek, součty, extrémy a&nbsp;položky, kde si AI není jistá.</div>
+        </div>
+        <div class="group-card">
+          <div class="group-icon">🔐</div>
+          <div class="group-name">Citlivost</div>
+          <div class="group-subtitle">Data policy</div>
+          <div class="group-desc">Rozlišujte veřejná, citlivá a&nbsp;kritická data. Bezpečnost řešte workflowem, ne plošným zákazem.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 07.1 · ČISTŠÍ DATA ══════╗ -->
+    <div class="slide" data-slide="30" data-title="Čistší data" data-sub="true">
+      <div class="slide-num">07.1</div>
+      <h2>Čistší data, lepší výstup</h2>
+      <p class="lead">Filipův experiment s&nbsp;bankovními výpisy ukázal jednoduchou pravdu: když do AI pošlete špinavý vstup, dostanete chytrý, ale špinavý výstup.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div><div class="session-title">Pracujte s&nbsp;kopií</div><div class="session-desc">Nikdy neupravujte původní export. Vytvořte pracovní verzi pro AI.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div><div class="session-title">Zúžte kontext</div><div class="session-desc">Nechte jen relevantní sloupce a&nbsp;řádky. Pokud řešíte jeden sloupec, pošlete jeden sloupec.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div><div class="session-title">Ověřte vzorek</div><div class="session-desc">Spočítejte pár položek ručně, zkontrolujte extrémy, vyžádejte si položky s&nbsp;nízkou jistotou.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div><div class="session-title">Ladíte prompt</div><div class="session-desc">Když AI zamění Mironet za Miro, není konec. Přidejte pravidlo: nehádej, označ nejistotu.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 08 · PŘÍBĚHY Z PRAXE ══════╗ -->
+    <div class="slide" data-slide="32" data-title="Příběhy z praxe" data-num="08">
+      <div class="slide-num">08</div>
+      <h2>Příběhy z&nbsp;praxe</h2>
+      <p class="lead">Nejsilnější lekce z&nbsp;modulu: stejný princip se objevuje v&nbsp;osobních financích, CRM, due diligence i&nbsp;interních reportech.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div><div class="session-title">3&nbsp;000 řádků bankovních výpisů</div><div class="session-desc">Chatboty daly rychlý přehled, ale nejspolehlivější byly Cursor a&nbsp;Claude Code, protože psaly skripty a&nbsp;kontrolovaly výsledek.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div><div class="session-title">Martin: 12&nbsp;000 firem v&nbsp;CRM</div><div class="session-desc">Export ze Salesforce → GPT API + SERP API → klasifikace Oil &amp; Gas → obohacené CSV zpět do CRM.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div><div class="session-title">FAIL účastnická data</div><div class="session-desc">Airtable, Typeform, Slido a&nbsp;e-maily → jeden řádek na člověka → karty účastníků a&nbsp;personalizovaná podpora.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div><div class="session-title">Due diligence pro právníky</div><div class="session-desc">Plan mode → malý vzorek → API, browser mode, WhatsApp export, Gmail export → čištění v&nbsp;Cursoru.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">05</div>
+          <div><div class="session-title">Mirek: incident report</div><div class="session-desc">Teams konverzace → časová osa, příčiny, poučení → Confluence markup. Úspora zhruba 80&nbsp;% práce.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 09 · KLÍČOVÉ TAKEAWAYS ══════╗ -->
+    <div class="slide" data-slide="33" data-title="Klíčové takeaways" data-num="09">
+      <div class="slide-num">09</div>
+      <h2>Klíčové takeaways</h2>
+      <p class="lead">Pět věcí, které si z&nbsp;tohoto modulu odneste — a&nbsp;které vám změní způsob, jakým přemýšlíte o&nbsp;datech.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div><div class="session-title">Nemáte v&nbsp;pořádku data? Nevadí.</div><div class="session-desc">To skoro nikdo. Důležité je začít s&nbsp;nimi pracovat a&nbsp;využívat je — ne čekat na dokonalý stav.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div><div class="session-title">Dělejte si výběrové řízení</div><div class="session-desc">Zkoušejte víc nástrojů na stejný úkol — ať vidíte rozdíl mezi chatbotem, tabulkou a&nbsp;skriptem.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div><div class="session-title">To, že můžeme, neznamená, že musíme</div><div class="session-desc">Nedělejme reporty pro reporty. Každá analýza by měla vést k&nbsp;rozhodnutí nebo akci.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div><div class="session-title">Akce přináší informace</div><div class="session-desc">Začněte manuálně a&nbsp;hrajte si s&nbsp;daty co nejdříve. Teprve pak automatizujte to, co funguje.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">05</div>
+          <div><div class="session-title">Připravte se na dobu AI agentů</div><div class="session-desc">Data jsou součástí vašeho druhého mozku. Napojte je na AI a&nbsp;začněte řešit, jak bude vypadat práce v&nbsp;době agentů.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════ 10 · AKČNÍ PLÁN ══════╗ -->
+    <div class="slide" data-slide="34" data-title="Akční plán" data-num="10">
+      <div class="slide-num">10</div>
+      <h2>Akční plán: co udělat tento týden</h2>
+      <p class="lead">Nečekejte na ideální dataset. Začněte na něčem, co znáte, kde dokážete ověřit výsledek a&nbsp;kde rychle uvidíte hodnotu.</p>
+      <div class="two-col">
+        <div>
+          <div class="col-label" style="color: var(--blue);">Pro jednotlivce</div>
+          <ul>
+            <li>Postavit interaktivní report (výpis z&nbsp;účtu + strategie úspor nebo investic přes Deep Research).</li>
+            <li>Analyzovat větší množství nestrukturovaných dat (zápisy, e-maily, konverzace).</li>
+            <li>Nechat se překvapit — AI jako mozek: „Řekni mi, na co bych se měl zaměřit."</li>
+          </ul>
+        </div>
+        <div>
+          <div class="col-label" style="color: var(--accent);">Pro týmy</div>
+          <ul>
+            <li>Zjistit možnosti napojení na interní data (CRM, ERP, ticketing, HR systémy).</li>
+            <li>Probrat možnosti analýzy dat v&nbsp;chatovacích aplikacích — kdy ano, kdy ne, jak.</li>
+            <li>Vytvořte jednoduchou matici citlivosti dat (co kam smí).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cta-box">
+        <h3>Learning by doing tady platí dvojnásob.</h3>
+        <p>Nejdřív udělejte malý experiment. Pak z&nbsp;něj vytvořte proces. A&nbsp;teprve potom automatizujte.</p>
+      </div>
+    </div>
+
+    <!-- ╔══════ 10.1 · DOMÁCÍ ÚKOL ══════╗ -->
+    <div class="slide" data-slide="35" data-title="Domácí úkol" data-sub="true">
+      <div class="slide-num">10.1</div>
+      <h2>Domácí úkol: analýza osobních financí</h2>
+      <p class="lead">Fantastické cvičení na kombinaci všeho, co se učíme ve FAILu: sběr dat, analýza, vizualizace, insighty a&nbsp;akce. Vezměte reálná finanční data a&nbsp;proměňte je v&nbsp;rozhodnutí.</p>
+      <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin: 18px 0;">
+        <div class="session-row">
+          <div class="session-num">01</div>
+          <div><div class="session-title">Exportujte výpisy</div><div class="session-desc">Stáhněte bankovní výpisy, exportujte data ze všech účtů. Dejte je na jedno místo — jde o&nbsp;to mít přehled o&nbsp;příjmech a&nbsp;výdajích.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">02</div>
+          <div><div class="session-title">Zvolte nástroj</div><div class="session-desc">Udělejte si výběrové řízení: zkuste Excel + Copilot, Claude, ChatGPT nebo Cursor/Claude Code. Porovnejte, který vám vyhovuje víc.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">03</div>
+          <div><div class="session-title">Analyzujte a&nbsp;vizualizujte</div><div class="session-desc">Nechte AI zanalyzovat vaše finance a&nbsp;vytvořit interaktivní graf nebo report. Nemusíte umět programovat — stačí popsat, co chcete.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">04</div>
+          <div><div class="session-title">Jděte o&nbsp;krok dál</div><div class="session-desc">Hoďte data zpět do AI a&nbsp;řekněte: jak můžu ušetřit? Kde získám víc? Použijte Deep Research na investice, konsolidaci služeb nebo lepší tarify.</div></div>
+        </div>
+        <div class="session-row">
+          <div class="session-num">05</div>
+          <div><div class="session-title">Udělejte akci</div><div class="session-desc">Zrušte zbytečné předplatné, poptejte lepší ceny, investujte úspory. Jeden účastník za hodinu práce zjistil, že konsolidací výdajů a&nbsp;investicí úspor bude mít o&nbsp;miliony víc v&nbsp;důchodu.</div></div>
+        </div>
+      </div>
+      <div class="verdict-box">
+        <p><strong>Čím dříve začnete, tím dříve zjistíte další věci.</strong> Akce přináší informace. Nehledejte 100&nbsp;% — hledejte jedno zlepšení, jednu úsporu, jedno lepší rozhodnutí.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ BOTTOM BAR (slides mode only) ═══ -->
+  <div class="bottom-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="nav-btn-slide" id="btnToggleSidebar" onclick="toggleSidebar()" title="Schovat/zobrazit menu" style="padding: 8px 12px;">☰</button>
+      <span class="slide-counter" id="slideCounter">1 / N</span>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn-slide" id="btnPrev" onclick="goSlide(-1)">← Předchozí</button>
+      <button class="nav-btn-slide" id="btnNext" onclick="goSlide(1)">Další →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const wrapper = document.getElementById('slidesWrapper');
+const counter = document.getElementById('slideCounter');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const sidebarNav = document.getElementById('sidebarNav');
+const webNavInner = document.getElementById('webNavInner');
+
+slides.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-item' + (s.dataset.sub === 'true' ? ' sub' : '') + (i === 0 ? ' active' : '');
+  const num = s.dataset.num || '';
+  btn.innerHTML = (num ? '<span class="nav-num">' + num + '</span>' : '') + '<span>' + s.dataset.title + '</span>';
+  btn.onclick = () => { s.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  btn.dataset.idx = i;
+  sidebarNav.appendChild(btn);
+
+  if (s.dataset.num && !s.dataset.sub) {
+    const nextSlide = slides[i + 1];
+    if (nextSlide && nextSlide.dataset.sub === 'true') {
+    } else if (i < slides.length - 1) {
+      const sep = document.createElement('div');
+      sep.className = 'nav-sep';
+      sidebarNav.appendChild(sep);
+    }
+  }
+
+  if (s.dataset.num && !s.dataset.sub) {
+    const wb = document.createElement('button');
+    const isFirstMain = webNavInner.children.length === 0;
+    wb.className = 'web-nav-btn' + (isFirstMain ? ' active' : '');
+    wb.textContent = s.dataset.title;
+    wb.dataset.idx = i;
+    wb.onclick = () => { s.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    webNavInner.appendChild(wb);
+  }
+});
+
+let currentSlide = 0;
+
+function updateUI() {
+  counter.textContent = (currentSlide + 1) + ' / ' + slides.length;
+  btnPrev.disabled = currentSlide === 0;
+  btnNext.disabled = currentSlide === slides.length - 1;
+  sidebarNav.querySelectorAll('.nav-item').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.idx) === currentSlide);
+  });
+}
+
+function goSlide(dir) {
+  const next = currentSlide + dir;
+  if (next >= 0 && next < slides.length) {
+    slides[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio > 0.3) {
+      currentSlide = parseInt(e.target.dataset.slide);
+      updateUI();
+    }
+  });
+}, { root: wrapper, threshold: [0.3, 0.6] });
+slides.forEach(s => obs.observe(s));
+
+const webObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const slide = e.target;
+      const num = slide.dataset.num;
+      if (num) {
+        webNavInner.querySelectorAll('.web-nav-btn').forEach(b => b.classList.remove('active'));
+        const match = webNavInner.querySelector('.web-nav-btn[data-idx="' + slide.dataset.slide + '"]');
+        if (match) match.classList.add('active');
+      }
+    }
+  });
+}, { rootMargin: '-100px 0px -60% 0px' });
+slides.forEach(s => webObs.observe(s));
+
+let mode = 'slides';
+
+function setMode(m) {
+  mode = m;
+  const fabWeb = document.getElementById('fabWeb');
+  const fabSlides = document.getElementById('fabSlides');
+  if (m === 'slides') {
+    document.body.classList.add('slides-mode');
+    document.body.classList.remove('fullscreen');
+    fabWeb.classList.remove('active');
+    fabSlides.classList.add('active');
+    wrapper.scrollTop = 0;
+  } else {
+    document.body.classList.remove('slides-mode', 'sidebar-collapsed', 'fullscreen');
+    fabWeb.classList.add('active');
+    fabSlides.classList.remove('active');
+    window.scrollTo(0, 0);
+  }
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-collapsed');
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    if (mode === 'web') setMode('slides');
+    document.documentElement.requestFullscreen();
+    document.body.classList.add('fullscreen');
+  } else {
+    document.exitFullscreen();
+    document.body.classList.remove('fullscreen');
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    document.body.classList.remove('fullscreen');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (mode === 'slides') {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goSlide(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goSlide(-1); }
+    if (e.key === 'Escape' && !document.fullscreenElement) { toggleSidebar(); }
+  }
+  if (e.key === 'f' || e.key === 'F') {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    toggleFullscreen();
+  }
+});
+
+setMode('slides');
+updateUI();
+</script>
+
+</body>
+</html>
